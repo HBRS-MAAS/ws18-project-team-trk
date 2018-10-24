@@ -8,7 +8,7 @@ import org.Team_TRK.agents.DummyAgent;
 public class Start {
     public static void main(String[] args) {
     	List<String> agents = new Vector<>();
-    	agents.add("test:org.yourteamname.agents.DummyAgent");
+    	agents.add("test:org.Team_TRK.agents.DummyAgent");
 
     	List<String> cmd = new Vector<>();
     	cmd.add("-agents");

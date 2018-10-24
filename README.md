@@ -1,10 +1,11 @@
-# MAAS Project - <Team Name>
+# MAAS Project - Team-TRK
 
 Add a brief description of your project. Make sure to keep this README updated, particularly on how to run your project from the **command line**.
 
 ## Team Members
-* Name1 LastName1 - [@githubusername](https://github.com/username)
-* Name2 LastName2 - [@githubusername](https://github.com/username)
+* Robert Seboldt - [@Umkipp](https://github.com/Umkipp)
+* Kirill Schreiner - [@kschre](https://github.com/kschre)
+* Tim van der Meulen - [@tmeule2s](https://github.com/tmeule2s)
 
 ## Dependencies
 * JADE v.4.5.0

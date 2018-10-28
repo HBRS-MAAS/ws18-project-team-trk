@@ -1,10 +1,15 @@
-# MAAS Project - <Team Name>
+# MAAS Project - Team-TRK
+
+Master [![Build Status](https://travis-ci.org/HBRS-MAAS/ws18-project-team-trk.svg?branch=master)](https://travis-ci.org/HBRS-MAAS/ws18-project-team-trk)
+
+Develop [![Build Status](https://travis-ci.org/HBRS-MAAS/ws18-project-team-trk.svg?branch=develop)](https://travis-ci.org/HBRS-MAAS/ws18-project-team-trk)
 
 Add a brief description of your project. Make sure to keep this README updated, particularly on how to run your project from the **command line**.
 
 ## Team Members
-* Name1 LastName1 - [@githubusername](https://github.com/username)
-* Name2 LastName2 - [@githubusername](https://github.com/username)
+* Robert Seboldt - [@Umkipp](https://github.com/Umkipp)
+* Kirill Schreiner - [@kschre](https://github.com/kschre)
+* Tim van der Meulen - [@tmeule2s](https://github.com/tmeule2s)
 
 ## Dependencies
 * JADE v.4.5.0

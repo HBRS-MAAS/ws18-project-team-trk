@@ -1,5 +1,9 @@
 # MAAS Project - Team-TRK
 
+Master [![Build Status](https://travis-ci.org/HBRS-MAAS/ws18-project-team-trk.svg?branch=master)](https://travis-ci.org/HBRS-MAAS/ws18-project-team-trk)
+
+Develop [![Build Status](https://travis-ci.org/HBRS-MAAS/ws18-project-team-trk.svg?branch=develop)](https://travis-ci.org/HBRS-MAAS/ws18-project-team-trk)
+
 Add a brief description of your project. Make sure to keep this README updated, particularly on how to run your project from the **command line**.
 
 ## Team Members

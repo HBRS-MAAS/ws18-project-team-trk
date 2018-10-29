@@ -1,5 +1,6 @@
 # MAAS Project - Team-TRK
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/6b65a987014c498da2df253ff30a0d4a)](https://app.codacy.com/app/tmeule2s/ws18-project-team-trk?utm_source=github.com&utm_medium=referral&utm_content=HBRS-MAAS/ws18-project-team-trk&utm_campaign=Badge_Grade_Dashboard)
 Master [![Build Status](https://travis-ci.org/HBRS-MAAS/ws18-project-team-trk.svg?branch=master)](https://travis-ci.org/HBRS-MAAS/ws18-project-team-trk)
 
 Develop [![Build Status](https://travis-ci.org/HBRS-MAAS/ws18-project-team-trk.svg?branch=develop)](https://travis-ci.org/HBRS-MAAS/ws18-project-team-trk)

@@ -7,8 +7,8 @@ Develop [![Build Status](https://travis-ci.org/HBRS-MAAS/ws18-project-team-trk.s
 Add a brief description of your project. Make sure to keep this README updated, particularly on how to run your project from the **command line**.
 
 ## Team Members
-* Robert Seboldt - [@Umkipp](https://github.com/Umkipp)
-* Kirill Schreiner - [@kschre](https://github.com/kschre)
+* Robert Seboldt     - [@Umkipp](https://github.com/Umkipp)
+* Kirill Schreiner   - [@kschre](https://github.com/kschre)
 * Tim van der Meulen - [@tmeule2s](https://github.com/tmeule2s)
 
 ## Dependencies

@@ -1,14 +1,13 @@
-package org.Team_TRK;
+package org.team_trk;
 
 import java.util.List;
 import java.util.Vector;
-
-import org.Team_TRK.agents.DummyAgent;
+//import org.Team_TRK.agents.DummyAgent;
 
 public class Start {
     public static void main(String[] args) {
     	List<String> agents = new Vector<>();
-    	agents.add("test:org.Team_TRK.agents.DummyAgent");
+    	agents.add("test:org.team_trk.agents.DummyAgent");
 
     	List<String> cmd = new Vector<>();
     	cmd.add("-agents");

@@ -1,4 +1,4 @@
-package org.Team_TRK.agents;
+package org.team_trk.agents;
 
 import jade.content.lang.Codec;
 import jade.content.lang.sl.SLCodec;

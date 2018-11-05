@@ -5,7 +5,11 @@ Master [![Build Status](https://travis-ci.org/HBRS-MAAS/ws18-project-team-trk.sv
 
 Develop [![Build Status](https://travis-ci.org/HBRS-MAAS/ws18-project-team-trk.svg?branch=develop)](https://travis-ci.org/HBRS-MAAS/ws18-project-team-trk)
 
-Add a brief description of your project. Make sure to keep this README updated, particularly on how to run your project from the **command line**.
+The project contains a simple Jade client that tries to buy breads from a bakery. 
+The bakery responses to the request with a random price. 
+The buyer chooses the response with the lowest price and places the actual order.
+The bakery accepts the order and sends a response.
+The buyer gets the final response and closes.
 
 ## Team Members
 * Robert Seboldt     - [@Umkipp](https://github.com/Umkipp)

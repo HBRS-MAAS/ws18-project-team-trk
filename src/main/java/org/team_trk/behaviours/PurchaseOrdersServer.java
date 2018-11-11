@@ -1,5 +1,7 @@
 package org.team_trk.behaviours;
 
+import java.util.List;
+
 import org.json.JSONObject;
 
 import jade.core.behaviours.CyclicBehaviour;
@@ -12,8 +14,7 @@ public class PurchaseOrdersServer extends CyclicBehaviour {
 
 //	private Hashtable<String, Book> catalogue;
 
-	public PurchaseOrdersServer(/* Hashtable<String, Book> catalogue */) {
-//		this.catalogue = catalogue;
+	public PurchaseOrdersServer(List<Object> orderedBreads) {
 	}
 
 	@Override

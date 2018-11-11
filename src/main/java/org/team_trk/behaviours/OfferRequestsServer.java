@@ -1,5 +1,7 @@
 package org.team_trk.behaviours;
 
+import java.util.List;
+
 import org.json.JSONObject;
 
 import jade.core.behaviours.CyclicBehaviour;
@@ -9,7 +11,7 @@ import jade.lang.acl.MessageTemplate;
 public class OfferRequestsServer extends CyclicBehaviour {
 	private static final long serialVersionUID = -3863996398471466048L;
 
-	public OfferRequestsServer() {
+	public OfferRequestsServer(List<Object> recipes) {
 	}
 
 	public void action() {

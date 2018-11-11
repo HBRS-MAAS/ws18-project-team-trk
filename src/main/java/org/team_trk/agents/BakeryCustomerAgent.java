@@ -3,6 +3,7 @@ package org.team_trk.agents;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.json.JSONObject;
 import org.team_trk.behaviours.RequestPerformer;
 import org.team_trk.domain.BreadOrder;
 
@@ -11,6 +12,7 @@ import jade.content.lang.sl.SLCodec;
 import jade.content.onto.basic.Action;
 import jade.core.AID;
 import jade.core.Agent;
+import jade.core.Location;
 import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.TickerBehaviour;
 import jade.domain.DFService;
@@ -27,7 +29,9 @@ public class BakeryCustomerAgent extends Agent {
 
 	private static int instance_counter = 0;
 
-	private BreadOrder breadOrder;
+	private List<BreadOrder> breadOrders;
+
+	private String name;
 
 	private AID[] bakeries;
 
@@ -35,24 +39,28 @@ public class BakeryCustomerAgent extends Agent {
 		instance_counter++;
 	}
 
+	@SuppressWarnings("unchecked")
 	protected void setup() {
 		// Printout a welcome message
 		Object[] args = getArguments();
 		if (args != null && args.length > 0) {
-			breadOrder = (BreadOrder) args[0];
-			System.out.println("Trying to buy " + breadOrder);
+			name = (String) args[0];
+			breadOrders = (List<BreadOrder>) args[1];
+//			System.out.println("Trying to buy " + new JSONObject(breadOrder));
 		} else {
 			// Make the agent terminate immediately
 			System.out.println("No breadOrder specified");
 			doDelete();
 		}
 
+//		addBehaviour(new UpdateAgentAIDs(this, new ArrayList<>()));
+
 		// Add a TickerBehaviour that schedules a request to seller agents every minute
 		addBehaviour(new TickerBehaviour(this, 10000) {
 			List<Behaviour> behaviours = new ArrayList<>();
 
 			protected void onTick() {
-				if (behaviours.size() >0) {
+				if (behaviours.size() > 0) {
 					for (Behaviour b : behaviours) {
 						if (!b.done()) {
 							return;
@@ -93,15 +101,22 @@ public class BakeryCustomerAgent extends Agent {
 				} catch (FIPAException fe) {
 					fe.printStackTrace();
 				}
-				RequestPerformer behav = new RequestPerformer(breadOrder, bakeries);
-				behaviours.add(behav);
-				addBehaviour(behav);
+				for (BreadOrder breadOrder : breadOrders) {
+					RequestPerformer behav = new RequestPerformer(breadOrder, bakeries);
+					behaviours.add(behav);
+					addBehaviour(behav);
+				}
 			}
 		});
 	}
 
 	protected void takeDown() {
-		System.out.println(getAID().getLocalName() + ": Terminating.");
+		// Deregister from the yellow pages
+		try {
+			DFService.deregister(this);
+		} catch (FIPAException fe) {
+			fe.printStackTrace();
+		}
 	}
 
 }

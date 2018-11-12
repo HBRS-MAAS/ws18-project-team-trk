@@ -22,9 +22,9 @@ import org.team_trk.agents.BakeryOvenAgent;
 import org.team_trk.agents.BakeryPackagingAgent;
 import org.team_trk.agents.BakeryProcessingAgent;
 import org.team_trk.agents.BakeryProoferAgent;
-import org.team_trk.agents.MailboxAgent;
 import org.team_trk.agents.TruckAgent;
 import org.team_trk.domain.BreadOrder;
+import org.team_trk.domain.Product;
 
 import com.google.gson.Gson;
 
@@ -277,150 +277,6 @@ class BakeryObject {
 
 	public void setEquipment(Equipment equipment) {
 		this.equipment = equipment;
-	}
-
-	class Product {
-		private String guid;
-		private Batch batch;
-		private Recipe recipe;
-		private Packaging packaging;
-		private double salesPrice;
-		private double productionCost;
-
-		public String getGuid() {
-			return guid;
-		}
-
-		public void setGuid(String guid) {
-			this.guid = guid;
-		}
-
-		public Batch getBatch() {
-			return batch;
-		}
-
-		public void setBatch(Batch batch) {
-			this.batch = batch;
-		}
-
-		public Recipe getRecipe() {
-			return recipe;
-		}
-
-		public void setRecipe(Recipe recipe) {
-			this.recipe = recipe;
-		}
-
-		public Packaging getPackaging() {
-			return packaging;
-		}
-
-		public void setPackaging(Packaging packaging) {
-			this.packaging = packaging;
-		}
-
-		public double getSalesPrice() {
-			return salesPrice;
-		}
-
-		public void setSalesPrice(double salesPrice) {
-			this.salesPrice = salesPrice;
-		}
-
-		public double getProductionCost() {
-			return productionCost;
-		}
-
-		public void setProductionCost(double productionCost) {
-			this.productionCost = productionCost;
-		}
-
-		class Batch {
-			private int breadsPerOven;
-
-			public int getBreadsPerOven() {
-				return breadsPerOven;
-			}
-
-			public void setBreadsPerOven(int breadsPerOven) {
-				this.breadsPerOven = breadsPerOven;
-			}
-		}
-	}
-
-	class Packaging {
-		private int boxingTemp;
-		private int breadsPerBox;
-
-		public int getBoxingTemp() {
-			return boxingTemp;
-		}
-
-		public void setBoxingTemp(int boxingTemp) {
-			this.boxingTemp = boxingTemp;
-		}
-
-		public int getBreadsPerBox() {
-			return breadsPerBox;
-		}
-
-		public void setBreadsPerBox(int breadsPerBox) {
-			this.breadsPerBox = breadsPerBox;
-		}
-
-	}
-
-	class Recipe {
-		private int coolingRate;
-		private int bakingTemp;
-
-		private List<Step> steps;
-
-		public int getCoolingRate() {
-			return coolingRate;
-		}
-
-		public void setCoolingRate(int coolingRate) {
-			this.coolingRate = coolingRate;
-		}
-
-		public int getBakingTemp() {
-			return bakingTemp;
-		}
-
-		public void setBakingTemp(int bakingTemp) {
-			this.bakingTemp = bakingTemp;
-		}
-
-		public List<Step> getSteps() {
-			return steps;
-		}
-
-		public void setSteps(List<Step> steps) {
-			this.steps = steps;
-		}
-
-		class Step {
-			private String action;
-			private int duration;
-
-			public String getAction() {
-				return action;
-			}
-
-			public void setAction(String action) {
-				this.action = action;
-			}
-
-			public int getDuration() {
-				return duration;
-			}
-
-			public void setDuration(int duration) {
-				this.duration = duration;
-			}
-
-		}
 	}
 
 	class Equipment {

@@ -112,11 +112,11 @@ public class BakeryCustomerAgent extends Agent {
 
 	protected void takeDown() {
 		// Deregister from the yellow pages
-		try {
-			DFService.deregister(this);
-		} catch (FIPAException fe) {
-			fe.printStackTrace();
-		}
+//		try {
+//			DFService.deregister(this);
+//		} catch (FIPAException fe) {
+//			fe.printStackTrace();
+//		}
 	}
 
 }

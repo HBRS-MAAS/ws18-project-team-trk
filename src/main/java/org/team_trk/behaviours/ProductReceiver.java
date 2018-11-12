@@ -2,16 +2,21 @@ package org.team_trk.behaviours;
 
 import java.util.List;
 
-import org.json.JSONObject;
+import org.team_trk.domain.Product;
+
+import com.google.gson.Gson;
 
 import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
-public class OfferRequestsServer extends CyclicBehaviour {
+public class ProductReceiver extends CyclicBehaviour {
 	private static final long serialVersionUID = -3863996398471466048L;
 
-	public OfferRequestsServer(List<Object> recipes) {
+	private List<Product> products;
+
+	public ProductReceiver(List<Product> products) {
+		this.products = products;
 	}
 
 	public void action() {
@@ -20,23 +25,16 @@ public class OfferRequestsServer extends CyclicBehaviour {
 		if (msg != null) {
 // Message received. Process it
 			String msgContent = msg.getContent();
-			JSONObject order = new JSONObject(msgContent);
-			System.out.println("Got request for order " + order);
+			Product product = new Gson().fromJson(msgContent, Product.class);
+			products.add(product);
+			System.out.println("Got request for order " + msgContent);
 
 			ACLMessage reply = msg.createReply();
-			Double price = Math.random() * 20;
-			if (price != null && price != 0) {
 // The requested book is available for sale. Reply with the price
-				reply.setPerformative(ACLMessage.PROPOSE);
-				reply.setContent(String.valueOf(price.intValue()));
-			} else {
-// The requested book is NOT available for sale.
-				reply.setPerformative(ACLMessage.REFUSE);
-				reply.setContent("not-available");
-			}
+			reply.setPerformative(ACLMessage.CONFIRM);
 			myAgent.send(reply);
 			System.out.println("Send reply " + ACLMessage.getPerformative(reply.getPerformative())
-					+ " to request on order " + order);
+					+ " to request on order " + msgContent);
 		} else {
 			block();
 		}

@@ -1,5 +1,14 @@
 package org.team_trk.agents;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.team_trk.behaviours.ProductProcesser;
+import org.team_trk.behaviours.ProductReceiver;
+import org.team_trk.behaviours.ProductSender;
+import org.team_trk.behaviours.PurchaseOrdersServer;
+import org.team_trk.domain.Product;
+
 import jade.core.Agent;
 import jade.domain.DFService;
 import jade.domain.FIPAException;
@@ -24,15 +33,23 @@ public class BakeryCoolingRacksAgent extends Agent {
 			fe.printStackTrace();
 		}
 
+		List<Product> in = new ArrayList<>();
+		List<Product> out = new ArrayList<>();
+
 		// Add the behaviour serving requests for offer from buyer agents
-//		addBehaviour(new OfferRequestsServer(recipes));
+		addBehaviour(new ProductReceiver(in));
+
+		addBehaviour(new ProductProcesser(() -> {
+			out.addAll(in);
+			in.clear();
+		}));
 		// Add the behaviour serving purchase orders from buyer agents
-//		addBehaviour(new PurchaseOrdersServer(orderedBreads));
+		addBehaviour(new ProductSender(out, new ArrayList<>()));
 	}
 
 	protected void takeDown() {
 		// Printout a dismissal message
-		System.out.println("Bakery-agent " + getAID().getName() + " terminating.");
+		System.out.println("Cooling rack " + getAID().getName() + " terminating.");
 		// Deregister from the yellow pages
 		try {
 			DFService.deregister(this);

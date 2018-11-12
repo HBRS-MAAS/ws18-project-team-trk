@@ -15,7 +15,6 @@ public class BakeryDoughPrepTableAgent extends Agent {
 	// Put agent initializations here
 	protected void setup() {
 		getAID().addUserDefinedSlot("location", here().getID());
-		System.out.println(getAID());
 		// Register service in the yellow pages
 		DFAgentDescription dfd = new DFAgentDescription();
 		dfd.setName(getAID());
@@ -23,7 +22,6 @@ public class BakeryDoughPrepTableAgent extends Agent {
 		sd.setType("bakery-prep-table");
 		sd.setName("JADE-bakery-prep-table");
 		dfd.addServices(sd);
-		System.out.println("--------------" + dfd.getName());
 		try {
 			DFService.register(this, dfd);
 		} catch (FIPAException fe) {

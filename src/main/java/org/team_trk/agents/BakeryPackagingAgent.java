@@ -15,7 +15,7 @@ import jade.domain.FIPAException;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 
-public class BakeryPackagingAgent extends Agent {
+public class BakeryPackagingAgent extends BaseAgent {
 	private static final long serialVersionUID = -5310054528477305012L;
 	private List<Object> ordereds;
 

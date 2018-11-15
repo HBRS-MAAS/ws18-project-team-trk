@@ -25,7 +25,7 @@ import jade.domain.JADEAgentManagement.ShutdownPlatform;
 import jade.lang.acl.ACLMessage;
 
 @SuppressWarnings("serial")
-public class BakeryCustomerAgent extends Agent {
+public class BakeryCustomerAgent extends BaseAgent {
 
 	private static int instance_counter = 0;
 

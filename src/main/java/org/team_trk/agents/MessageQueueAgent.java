@@ -15,7 +15,7 @@ import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
 
-public class MessageQueueGUIAgent extends Agent {
+public class MessageQueueAgent extends Agent {
 	private static final long serialVersionUID = -5310054528477305012L;
 	private boolean gui = false;
 
@@ -56,7 +56,7 @@ public class MessageQueueGUIAgent extends Agent {
 					}
 				} catch (FIPAException e) {
 					System.err.println(String.format("An error occured while starting the %s: %s",
-							MessageQueueGUIAgent.class.getSimpleName(), e.getMessage()));
+							MessageQueueAgent.class.getSimpleName(), e.getMessage()));
 //				e.printStackTrace();
 				}
 			}

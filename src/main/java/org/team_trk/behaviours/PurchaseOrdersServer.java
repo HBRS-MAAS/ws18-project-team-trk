@@ -3,6 +3,7 @@ package org.team_trk.behaviours;
 import java.util.List;
 
 import org.json.JSONObject;
+import org.team_trk.agents.BaseAgent;
 
 import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
@@ -12,6 +13,8 @@ public class PurchaseOrdersServer extends CyclicBehaviour {
 
 	private static final long serialVersionUID = 7938556330444711767L;
 
+	private BaseAgent baseAgent;
+
 //	private Hashtable<String, Book> catalogue;
 
 	public PurchaseOrdersServer(List<Object> orderedBreads) {
@@ -19,8 +22,11 @@ public class PurchaseOrdersServer extends CyclicBehaviour {
 
 	@Override
 	public void action() {
+		if(baseAgent==null) {
+			baseAgent = (BaseAgent) myAgent;
+		}
 		MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.ACCEPT_PROPOSAL);
-		ACLMessage msg = myAgent.receive(mt);
+		ACLMessage msg = baseAgent.receiveMessage(mt);
 		if (msg != null) {
 			String msgContent = msg.getContent();
 			JSONObject order = new JSONObject(msgContent);
@@ -35,7 +41,7 @@ public class PurchaseOrdersServer extends CyclicBehaviour {
 //				reply.setPerformative(ACLMessage.DISCONFIRM);
 //				reply.setContent("not-available");
 //			}
-			myAgent.send(reply);
+			baseAgent.sendMessage(reply);
 		} else {
 			block();
 		}

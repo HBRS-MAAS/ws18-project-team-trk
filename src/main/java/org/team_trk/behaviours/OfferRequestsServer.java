@@ -3,6 +3,7 @@ package org.team_trk.behaviours;
 import java.util.List;
 
 import org.json.JSONObject;
+import org.team_trk.agents.BaseAgent;
 
 import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
@@ -10,13 +11,18 @@ import jade.lang.acl.MessageTemplate;
 
 public class OfferRequestsServer extends CyclicBehaviour {
 	private static final long serialVersionUID = -3863996398471466048L;
+	
+	private BaseAgent baseAgent;
 
 	public OfferRequestsServer(List<Object> recipes) {
 	}
 
 	public void action() {
+		if(baseAgent==null) {
+			baseAgent = (BaseAgent) myAgent;
+		}
 		MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.CFP);
-		ACLMessage msg = myAgent.receive(mt);
+		ACLMessage msg = baseAgent.receiveMessage(mt);
 		if (msg != null) {
 // Message received. Process it
 			String msgContent = msg.getContent();
@@ -34,7 +40,7 @@ public class OfferRequestsServer extends CyclicBehaviour {
 				reply.setPerformative(ACLMessage.REFUSE);
 				reply.setContent("not-available");
 			}
-			myAgent.send(reply);
+			baseAgent.sendMessage(reply);
 			System.out.println("Send reply " + ACLMessage.getPerformative(reply.getPerformative())
 					+ " to request on order " + order);
 		} else {

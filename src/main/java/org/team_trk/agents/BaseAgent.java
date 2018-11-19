@@ -1,5 +1,7 @@
 package org.team_trk.agents;
 
+import java.io.IOException;
+
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
@@ -16,6 +18,7 @@ public abstract class BaseAgent extends Agent {
 	private int currentHour;
 	private boolean allowAction = false;
 	protected AID clockAgent = new AID("TimeKeeper", AID.ISLOCALNAME);
+	protected AID messageQueueAgent = new AID("MessageQueue", AID.ISLOCALNAME);
 	protected BaseAgent baseAgent = this;
 
 	/*
@@ -81,18 +84,31 @@ public abstract class BaseAgent extends Agent {
 		return currentHour;
 	}
 
-	/*
+	/**
 	 * This function is used as a middle man which uses the message for different
 	 * visualisation methods Use `baseAgent.sendMessage(message)` instead of
 	 * `myAgent.send(message)` in every behaviour.
 	 */
-	protected void sendMessage(ACLMessage msg) {
+	public void sendMessage(ACLMessage msg) {
 		this.send(msg);
 		this.visualiseHistoricalView(msg);
 		this.visualiseIndividualOrderStatus(msg);
-		this.visualiseMessageQueuesByAgent(msg);
+		this.visualiseMessageQueuesByAgent(msg, false);
 		this.visualiseOrderBoard(msg);
 		this.visualiseStreetNetwork(msg);
+	}
+
+	/**
+	 * This function is used as a middle man which uses the message for different
+	 * visualisation methods Use `baseAgent.receiveMessage(message)` instead of
+	 * `myAgent.receive(message)` in every behaviour.
+	 */
+	public ACLMessage receiveMessage(MessageTemplate mt) {
+		ACLMessage msg = this.receive(mt);
+		if (msg != null) {
+			this.visualiseMessageQueuesByAgent(msg, true);
+		}
+		return msg;
 	}
 
 	/*
@@ -104,7 +120,16 @@ public abstract class BaseAgent extends Agent {
 	protected void visualiseIndividualOrderStatus(ACLMessage msg) {
 	}
 
-	protected void visualiseMessageQueuesByAgent(ACLMessage msg) {
+	protected void visualiseMessageQueuesByAgent(ACLMessage msg, Boolean in) {
+		ACLMessage info = new ACLMessage(ACLMessage.INFORM);
+		try {
+			info.setContentObject(in);
+			info.addReceiver(messageQueueAgent);
+			this.send(info);
+		} catch (IOException e) {
+			System.err.println(
+					String.format("Informing message queue agent about message %s failed: %s", msg, e.getMessage()));
+		}
 	}
 
 	protected void visualiseOrderBoard(ACLMessage msg) {

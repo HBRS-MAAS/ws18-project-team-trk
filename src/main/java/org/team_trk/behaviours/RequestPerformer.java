@@ -1,6 +1,7 @@
 package org.team_trk.behaviours;
 
 import org.json.JSONObject;
+import org.team_trk.agents.BaseAgent;
 import org.team_trk.domain.BreadOrder;
 
 import jade.core.AID;
@@ -11,6 +12,8 @@ import jade.lang.acl.MessageTemplate;
 public class RequestPerformer extends Behaviour {
 
 	private static final long serialVersionUID = -147484173252708723L;
+
+	private BaseAgent baseAgent;
 
 	private AID bestSeller; // The agent who provides the best offer
 	private int bestPrice; // The best offered price
@@ -27,6 +30,9 @@ public class RequestPerformer extends Behaviour {
 	}
 
 	public void action() {
+		if(baseAgent==null) {
+			baseAgent = (BaseAgent) myAgent;
+		}
 		switch (step) {
 		case 0:
 // Send the cfp to all sellers
@@ -38,7 +44,7 @@ public class RequestPerformer extends Behaviour {
 			cfp.setContent(breadOrder.toString());
 			cfp.setConversationId("bread-order");
 			cfp.setReplyWith("cfp" + System.currentTimeMillis()); // Unique value
-			myAgent.send(cfp);
+			baseAgent.sendMessage(cfp);
 			System.out.println(String.format("Send buy request for bread order %s to all sellers.", breadOrder));
 // Prepare the template to get proposals
 			mt = MessageTemplate.and(MessageTemplate.MatchConversationId(cfp.getConversationId()),
@@ -47,7 +53,7 @@ public class RequestPerformer extends Behaviour {
 			break;
 		case 1:
 // Receive all proposals/refusals from seller agents
-			ACLMessage reply = myAgent.receive(mt);
+			ACLMessage reply = baseAgent.receiveMessage(mt);
 			if (reply != null) {
 // Reply received
 				if (reply.getPerformative() == ACLMessage.PROPOSE) {
@@ -72,11 +78,11 @@ public class RequestPerformer extends Behaviour {
 			// Send the purchase order to the seller that provided the best offer
 			ACLMessage order = new ACLMessage(ACLMessage.ACCEPT_PROPOSAL);
 			order.addReceiver(bestSeller);
-			
+
 			order.setContent(breadOrder.toString());
 			order.setConversationId("bread-order");
 			order.setReplyWith("order" + System.currentTimeMillis());
-			myAgent.send(order);
+			baseAgent.sendMessage(order);
 			System.out.println("Accepted proposalfor " + breadOrder + " from " + bestSeller);
 			// Prepare the template to get the purchase order reply
 			mt = MessageTemplate.and(MessageTemplate.MatchConversationId(order.getConversationId()),
@@ -85,7 +91,7 @@ public class RequestPerformer extends Behaviour {
 			break;
 		case 3:
 			// Receive the purchase order reply
-			reply = myAgent.receive(mt);
+			reply = baseAgent.receiveMessage(mt);
 			if (reply != null) {
 				// Purchase order reply received
 				if (reply.getPerformative() == ACLMessage.INFORM) {

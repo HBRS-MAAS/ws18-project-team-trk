@@ -22,6 +22,7 @@ import org.team_trk.agents.BakeryOvenAgent;
 import org.team_trk.agents.BakeryPackagingAgent;
 import org.team_trk.agents.BakeryProcessingAgent;
 import org.team_trk.agents.BakeryProoferAgent;
+import org.team_trk.agents.MessageQueueGUIAgent;
 import org.team_trk.agents.TruckAgent;
 import org.team_trk.domain.BreadOrder;
 import org.team_trk.domain.Product;
@@ -60,6 +61,9 @@ public class Start {
 		System.out.println("Launching the rma agent on the main container ...");
 		AgentController rma = mainContainer.createNewAgent("rma", "jade.tools.rma.rma", new Object[0]);
 		rma.start();
+		AgentController messageQueue = mainContainer.createNewAgent("MessageQueue", MessageQueueGUIAgent.class.getName(),
+				new Object[0]);
+		messageQueue.start();
 
 		String prooferGUID = "bakery-proofer";
 		String coolingRacksGUID = "bakery-cooling-racks";

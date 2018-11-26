@@ -26,6 +26,7 @@ import org.team_trk.agents.MessageQueueAgent;
 import org.team_trk.agents.TruckAgent;
 import org.team_trk.domain.BreadOrder;
 import org.team_trk.domain.Product;
+import org.team_trk.gui.MessageQueueGUI;
 
 import com.google.gson.Gson;
 
@@ -61,6 +62,15 @@ public class Start {
 		System.out.println("Launching the rma agent on the main container ...");
 		AgentController rma = mainContainer.createNewAgent("rma", "jade.tools.rma.rma", new Object[0]);
 		rma.start();
+
+		Thread t = new Thread() {
+			@Override
+			public void run() {
+				MessageQueueGUI.open(new String[0]);
+			}
+		};
+		t.start();
+
 		AgentController messageQueue = mainContainer.createNewAgent("MessageQueue", MessageQueueAgent.class.getName(),
 				new Object[0]);
 		messageQueue.start();

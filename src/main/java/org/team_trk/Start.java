@@ -63,13 +63,13 @@ public class Start {
 		AgentController rma = mainContainer.createNewAgent("rma", "jade.tools.rma.rma", new Object[0]);
 		rma.start();
 
-		Thread t = new Thread() {
-			@Override
-			public void run() {
-				MessageQueueGUI.open(new String[0]);
-			}
-		};
-		t.start();
+//		Thread t = new Thread() {
+//			@Override
+//			public void run() {
+//				MessageQueueGUI.open(new String[0]);
+//			}
+//		};
+//		t.start();
 
 		AgentController messageQueue = mainContainer.createNewAgent("MessageQueue", MessageQueueAgent.class.getName(),
 				new Object[0]);

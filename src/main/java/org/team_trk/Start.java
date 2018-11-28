@@ -22,11 +22,9 @@ import org.team_trk.agents.BakeryOvenAgent;
 import org.team_trk.agents.BakeryPackagingAgent;
 import org.team_trk.agents.BakeryProcessingAgent;
 import org.team_trk.agents.BakeryProoferAgent;
-import org.team_trk.agents.MessageQueueAgent;
 import org.team_trk.agents.TruckAgent;
 import org.team_trk.domain.BreadOrder;
 import org.team_trk.domain.Product;
-import org.team_trk.gui.MessageQueueGUI;
 
 import com.google.gson.Gson;
 
@@ -51,13 +49,20 @@ public class Start {
 		System.out.print("runtime created\n");
 
 		// Create a default profile
-		Profile profile = new ProfileImpl(null, 1200, null);
+		String ip = null;//"10.0.0.6";
+		int port = 1200;//1099;
+		Profile profile = new ProfileImpl(ip, port, null);
 		System.out.print("profile created\n");
 
 		// rt.startUp(profile);
 
 		System.out.println("Launching a whole in-process platform..." + profile);
-		jade.wrapper.AgentContainer mainContainer = rt.createMainContainer(profile);
+		jade.wrapper.AgentContainer mainContainer = null;
+		if (ip == null) {
+			mainContainer = rt.createMainContainer(profile);
+		} else {
+			mainContainer = rt.createAgentContainer(profile);
+		}
 		System.out.println("containers created");
 		System.out.println("Launching the rma agent on the main container ...");
 		AgentController rma = mainContainer.createNewAgent("rma", "jade.tools.rma.rma", new Object[0]);
@@ -71,83 +76,84 @@ public class Start {
 //		};
 //		t.start();
 
-		AgentController messageQueue = mainContainer.createNewAgent("MessageQueue", MessageQueueAgent.class.getName(),
-				new Object[0]);
-		messageQueue.start();
+//		AgentController messageQueue = mainContainer.createNewAgent("MessageQueue", MessageQueueAgent.class.getName(),
+//				new Object[0]);
+//		messageQueue.start();
 
-		String prooferGUID = "bakery-proofer";
-		String coolingRacksGUID = "bakery-cooling-racks";
+//		String prooferGUID = "bakery-proofer";
+//		String coolingRacksGUID = "bakery-cooling-racks";
 		String packagingGUID = "bakery-packaging";
-		String loadingBayGUID = "bakery-loading-bay";
-		String truckGUID = "truck";
-		String mailboxGUID = "customer-mailbox";
-
-		// start bakeries
-		List<BakeryObject> bakeries = loadConfigData(scenarioPath + "/bakeries.json", BakeryObjectList.class);
-		int port = 1200;
-		for (BakeryObject bObj : bakeries) {
-			port++;
-			// create a container for each bakery
-			jade.wrapper.AgentContainer sideContainer = rt.createAgentContainer(new ProfileImpl(null, port, null));
-
-			List<AID> ovenGuids = new ArrayList<>();
-			List<AID> prepTableGuids = new ArrayList<>();
-			List<AID> kneadingMachineGuids = new ArrayList<>();
-			if (bObj.getEquipment() != null) {
-				// start equipment agents for the bakery
-				org.team_trk.BakeryObject.Equipment e = bObj.getEquipment();
-				for (Oven o : e.getOvens()) {
-					AgentController oven = sideContainer.createNewAgent(o.getGuid(), BakeryOvenAgent.class.getName(),
-							new Object[] { bObj.getGuid(), o.getCoolingRate(), o.getHeatingRate(),
-									coolingRacksGUID + "-" + port });
-					oven.start();
-					ovenGuids.add(new AID(o.getGuid(), true));
-				}
-				for (KneadingMachine km : e.getKneadingMachines()) {
-					AgentController oven = sideContainer.createNewAgent(km.getGuid(),
-							BakeryKneadingAgent.class.getName(),
-							new Object[] { bObj.getGuid(), prooferGUID + "-" + port });
-					oven.start();
-					kneadingMachineGuids.add(new AID(km.getGuid(), true));
-				}
-				for (DoughPrepTable dpt : e.getDoughPrepTables()) {
-					AgentController oven = sideContainer.createNewAgent(dpt.getGuid(),
-							BakeryDoughPrepTableAgent.class.getName(),
-							new Object[] { bObj.getGuid(), kneadingMachineGuids });
-					oven.start();
-					prepTableGuids.add(new AID(dpt.getGuid(), true));
-
-				}
-			}
-
-			// start rest of agents for the bakery
-			sideContainer.createNewAgent(prooferGUID + "-" + port, BakeryProoferAgent.class.getName(),
-					new Object[] { ovenGuids }).start();
-			sideContainer.createNewAgent(coolingRacksGUID + "-" + port, BakeryCoolingRacksAgent.class.getName(),
-					new Object[] { packagingGUID + "-" + port }).start();
-			sideContainer.createNewAgent(packagingGUID + "-" + port, BakeryPackagingAgent.class.getName(),
-					new Object[] { loadingBayGUID + "-" + port }).start();
-			sideContainer.createNewAgent(loadingBayGUID + "-" + port, BakeryLoadingBayAgent.class.getName(),
-					new Object[] { truckGUID + "-" + port }).start();
-			sideContainer.createNewAgent(truckGUID + "-" + port, TruckAgent.class.getName(), new Object[] {}).start();
-
-			// start processing agents of bakery
-			AgentController controller = sideContainer.createNewAgent(bObj.getGuid(),
-					BakeryProcessingAgent.class.getName(), new Object[] { bObj.getName(), bObj.getProducts(), ovenGuids,
-							prepTableGuids, packagingGUID + "-" + port });
-			controller.start();
-		}
-
-		// start clients
-		List<ClientObject> clientObjects = loadConfigData(scenarioPath + "/clients.json", Clients.class);
-
-		for (ClientObject cObj : clientObjects) {
-			AgentController controller = mainContainer.createNewAgent(cObj.getGuid(),
-					BakeryCustomerAgent.class.getName(), new Object[] { cObj.getName(), cObj.getOrders() });
-			controller.start();
-//			mainContainer.createNewAgent(mailboxGUID, MailboxAgent.class.getName(), new Object[] {}).start();;
-		}
-
+//		String loadingBayGUID = "bakery-loading-bay";
+//		String truckGUID = "truck";
+//		String mailboxGUID = "customer-mailbox";
+//
+//		// start bakeries
+//		List<BakeryObject> bakeries = loadConfigData(scenarioPath + "/bakeries.json", BakeryObjectList.class);
+//		int port = 1200;
+//		for (BakeryObject bObj : bakeries) {
+//			port++;
+//			// create a container for each bakery
+//			jade.wrapper.AgentContainer sideContainer = rt.createAgentContainer(new ProfileImpl(null, port, null));
+//
+//			List<AID> ovenGuids = new ArrayList<>();
+//			List<AID> prepTableGuids = new ArrayList<>();
+//			List<AID> kneadingMachineGuids = new ArrayList<>();
+//			if (bObj.getEquipment() != null) {
+//				// start equipment agents for the bakery
+//				org.team_trk.BakeryObject.Equipment e = bObj.getEquipment();
+//				for (Oven o : e.getOvens()) {
+//					AgentController oven = sideContainer.createNewAgent(o.getGuid(), BakeryOvenAgent.class.getName(),
+//							new Object[] { bObj.getGuid(), o.getCoolingRate(), o.getHeatingRate(),
+//									coolingRacksGUID + "-" + port });
+//					oven.start();
+//					ovenGuids.add(new AID(o.getGuid(), true));
+//				}
+//				for (KneadingMachine km : e.getKneadingMachines()) {
+//					AgentController oven = sideContainer.createNewAgent(km.getGuid(),
+//							BakeryKneadingAgent.class.getName(),
+//							new Object[] { bObj.getGuid(), prooferGUID + "-" + port });
+//					oven.start();
+//					kneadingMachineGuids.add(new AID(km.getGuid(), true));
+//				}
+//				for (DoughPrepTable dpt : e.getDoughPrepTables()) {
+//					AgentController oven = sideContainer.createNewAgent(dpt.getGuid(),
+//							BakeryDoughPrepTableAgent.class.getName(),
+//							new Object[] { bObj.getGuid(), kneadingMachineGuids });
+//					oven.start();
+//					prepTableGuids.add(new AID(dpt.getGuid(), true));
+//
+//				}
+//			}
+//
+//			// start rest of agents for the bakery
+//			sideContainer.createNewAgent(prooferGUID + "-" + port, BakeryProoferAgent.class.getName(),
+//					new Object[] { ovenGuids }).start();
+//			sideContainer.createNewAgent(coolingRacksGUID + "-" + port, BakeryCoolingRacksAgent.class.getName(),
+//					new Object[] { packagingGUID + "-" + port }).start();
+//			sideContainer.createNewAgent(packagingGUID + "-" + port, BakeryPackagingAgent.class.getName(),
+//					new Object[] { loadingBayGUID + "-" + port }).start();
+//			sideContainer.createNewAgent(loadingBayGUID + "-" + port, BakeryLoadingBayAgent.class.getName(),
+//					new Object[] { truckGUID + "-" + port }).start();
+//			sideContainer.createNewAgent(truckGUID + "-" + port, TruckAgent.class.getName(), new Object[] {}).start();
+//
+//			// start processing agents of bakery
+//			AgentController controller = sideContainer.createNewAgent(bObj.getGuid(),
+//					BakeryProcessingAgent.class.getName(), new Object[] { bObj.getName(), bObj.getProducts(), ovenGuids,
+//							prepTableGuids, packagingGUID + "-" + port });
+//			controller.start();
+//		}
+//
+//		// start clients
+//		List<ClientObject> clientObjects = loadConfigData(scenarioPath + "/clients.json", Clients.class);
+//
+//		for (ClientObject cObj : clientObjects) {
+//			AgentController controller = mainContainer.createNewAgent(cObj.getGuid(),
+//					BakeryCustomerAgent.class.getName(), new Object[] { cObj.getName(), cObj.getOrders() });
+//			controller.start();
+////			mainContainer.createNewAgent(mailboxGUID, MailboxAgent.class.getName(), new Object[] {}).start();;
+//		}
+		mainContainer.createNewAgent(packagingGUID + "-" + 0202, BakeryPackagingAgent.class.getName(), new Object[0])
+				.start();
 	}
 
 	private static <T> T loadConfigData(String fileName, Class<T> dataClass) throws IOException, URISyntaxException {

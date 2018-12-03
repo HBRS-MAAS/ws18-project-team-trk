@@ -3,9 +3,14 @@ package org.team_trk.agents;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+
+import java.util.Hashtable;
+import org.right_brothers.utils.JsonConverter; // need the class JsonConverter to get HashTable out of String
+import org.right_brothers.data.messages.ProductMessage; // need class ProductMessage to get HashTable out of String
 
 import jade.core.AID;
 import jade.core.behaviours.CyclicBehaviour;
@@ -34,7 +39,8 @@ public class BakeryPackagingAgent extends BaseAgent {
 			fe.printStackTrace();
 		}
 
-		List<?> in = new ArrayList<>();// TODO in typ bestimmen
+		//List<?> in = new ArrayList<>();// TODO in typ bestimmen -> HashTable<String ID, int amount> kommt so rein von right brothers
+		Hashtable in = new Hashtable<String, Integer>();
 		List<OutObject> out = new ArrayList<>(
 				Arrays.asList(new OutObject("order-001", Arrays.asList(new Box("Bread", 10), new Box("Muffin", 2))),
 						new OutObject("order-002", Arrays.asList(new Box("Bread", 6), new Box("Berliner", 1))),
@@ -66,9 +72,26 @@ public class BakeryPackagingAgent extends BaseAgent {
 			@Override
 			public void action() {
 				switch (step_counter) {
-				case 0:// neue order annehmen (nachgucken wie die aussieht)
+				case 0: // received ACLMessage: HashT(ID, value) -> ProductMessage -> via JsonConverter to String -> via setContent into message content
+					ACLMessage msg = receive();
+					if(msg != null) {
+						String JsonSting_content = msg.getContent(); // String created out of the ProductMessage-Object with right brothers individual class JsonConverter
+						/**
+						 * Hier evt. Probleme mit individuellen Klassen
+						 */
+						ProductMessage p = JsonConverter.getInstance(JsonString_content, ProductMessage); // individual classes of right brothers to wrap HashTable into an Object
+						Hashtable<String,Integer> cooledProd = p.getProducts();
+						Set<String> tempIter = cooledProd.keySet(); // cannot iterate through Hastable but through a Set
+						for(String a : tempIter) {
+							in.put(a, cooledProd.get(a)); // append new Items with GU-ID to our List (Hashtabel) of Items
+							// btw, what is GUID?
+						}
+						step_counter++;
+					}
 					break;
 				case 1:// in überprüfen und ggf boxen in out packen
+						// 1. Liste vom Scheduler bekommen
+						// 2. Box zusammenstellen
 					break;
 				case 2:// send all boxes that contain all items of a type for an order
 					if (!out.isEmpty()) {
@@ -183,3 +206,4 @@ class Box {
 }
 
 //TODO class für eingehende sachen
+// nicht n�tig, da (hoffentlich) nachher Hastable reinkommt

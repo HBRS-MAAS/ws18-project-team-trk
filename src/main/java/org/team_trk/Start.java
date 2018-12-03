@@ -93,7 +93,7 @@ public class Start {
 //		for (BakeryObject bObj : bakeries) {
 //			port++;
 //			// create a container for each bakery
-//			jade.wrapper.AgentContainer sideContainer = rt.createAgentContainer(new ProfileImpl(null, port, null));
+			jade.wrapper.AgentContainer sideContainer = rt.createAgentContainer(new ProfileImpl(null, port, null));
 //
 //			List<AID> ovenGuids = new ArrayList<>();
 //			List<AID> prepTableGuids = new ArrayList<>();
@@ -137,23 +137,20 @@ public class Start {
 //			sideContainer.createNewAgent(truckGUID + "-" + port, TruckAgent.class.getName(), new Object[] {}).start();
 //
 //			// start processing agents of bakery
-//			AgentController controller = sideContainer.createNewAgent(bObj.getGuid(),
-//					BakeryProcessingAgent.class.getName(), new Object[] { bObj.getName(), bObj.getProducts(), ovenGuids,
-//							prepTableGuids, packagingGUID + "-" + port });
-//			controller.start();
+			AgentController controller = sideContainer.createNewAgent(/*bObj.getGuid()*/"bpagent",
+					BakeryProcessingAgent.class.getName(), /*new Object[] { bObj.getName(), bObj.getProducts(), ovenGuids,
+							prepTableGuids, packagingGUID + "-" + port*/new Object[0] );
+			controller.start();
 //		}
 //
 //		// start clients
-//		List<ClientObject> clientObjects = loadConfigData(scenarioPath + "/clients.json", Clients.class);
-//
-//		for (ClientObject cObj : clientObjects) {
-//			AgentController controller = mainContainer.createNewAgent(cObj.getGuid(),
-//					BakeryCustomerAgent.class.getName(), new Object[] { cObj.getName(), cObj.getOrders() });
-//			controller.start();
-////			mainContainer.createNewAgent(mailboxGUID, MailboxAgent.class.getName(), new Object[] {}).start();;
-//		}
-		mainContainer.createNewAgent(packagingGUID + "-" + 0202, BakeryPackagingAgent.class.getName(), new Object[0])
-				.start();
+		List<ClientObject> clientObjects = loadConfigData(scenarioPath + "/clients.json", Clients.class);
+
+		for (ClientObject cObj : clientObjects) {
+			AgentController controller2 = mainContainer.createNewAgent(cObj.getGuid(),
+					BakeryCustomerAgent.class.getName(), new Object[] { cObj.getName(), cObj.getOrders() });
+			controller2.start();
+		}
 	}
 
 	private static <T> T loadConfigData(String fileName, Class<T> dataClass) throws IOException, URISyntaxException {

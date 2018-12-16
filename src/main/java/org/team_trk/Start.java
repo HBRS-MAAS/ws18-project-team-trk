@@ -34,15 +34,15 @@ public class Start {
 		if (args != null && args.length > 0) {
 			scenarioPath = args[0];
 		} else {
-			PrintStream out = System.out;
-			OutputStream voidStream = new OutputStream() {
-				@Override
-				public void write(int b) throws IOException {
-				}
-			};
-			System.setOut(new PrintStream(voidStream));
+//			PrintStream out = System.out;
+//			OutputStream voidStream = new OutputStream() {
+//				@Override
+//				public void write(int b) throws IOException {
+//				}
+//			};
+//			System.setOut(new PrintStream(voidStream));
 			String[] list = new File("project/src/main/resources/config/").list();
-			try {
+//			try {
 				for (String s : list) {
 					System.err.println("------------------------------------------ running " + s
 							+ " ------------------------------------------");
@@ -55,9 +55,9 @@ public class Start {
 					System.err.println();
 				}
 
-			} finally {
-				System.setOut(out);
-			}
+//			} finally {
+//				System.setOut(out);
+//			}
 			System.err.println("finished all scenarios of: "+Arrays.toString(list));
 			return;
 		}

@@ -3,54 +3,80 @@ package org.team_trk;
 import java.awt.geom.Point2D;
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-import org.team_trk.BakeryObject.Equipment.DoughPrepTable;
-import org.team_trk.BakeryObject.Equipment.KneadingMachine;
-import org.team_trk.BakeryObject.Equipment.Oven;
-import org.team_trk.agents.BakeryCoolingRacksAgent;
 import org.team_trk.agents.BakeryCustomerAgent;
-import org.team_trk.agents.BakeryDoughPrepTableAgent;
-import org.team_trk.agents.BakeryKneadingAgent;
-import org.team_trk.agents.BakeryLoadingBayAgent;
-import org.team_trk.agents.BakeryOvenAgent;
-import org.team_trk.agents.BakeryPackagingAgent;
 import org.team_trk.agents.BakeryProcessingAgent;
-import org.team_trk.agents.BakeryProoferAgent;
-import org.team_trk.agents.TruckAgent;
 import org.team_trk.domain.BreadOrder;
 import org.team_trk.domain.Product;
 
 import com.google.gson.Gson;
 
-import jade.core.AID;
 import jade.core.Profile;
 import jade.core.ProfileImpl;
 import jade.wrapper.AgentController;
 import jade.wrapper.StaleProxyException;
 
 public class Start {
+
+	private static int instance_counter = 0;
+
 	public static void main(String[] args) throws StaleProxyException, IOException, URISyntaxException {
-		String scenarioPath = (args != null && args.length > 0) ? args[0] : "src/main/resources/config/sample";
+		String scenarioPath = "";
+		if (args != null && args.length > 0) {
+			scenarioPath = args[0];
+		} else {
+			PrintStream out = System.out;
+			OutputStream voidStream = new OutputStream() {
+				@Override
+				public void write(int b) throws IOException {
+				}
+			};
+			System.setOut(new PrintStream(voidStream));
+			String[] list = new File("project/src/main/resources/config/").list();
+			try {
+				for (String s : list) {
+					System.err.println("------------------------------------------ running " + s
+							+ " ------------------------------------------");
+					main(new String[] { "project/src/main/resources/config/" + s });
+					while (instance_counter > 0) {
+						System.out.println(instance_counter);
+					}
+					System.err.println("------------------------------------------ finished " + s
+							+ " ------------------------------------------");
+					System.err.println();
+				}
+
+			} finally {
+				System.setOut(out);
+			}
+			System.err.println("finished all scenarios of: "+Arrays.toString(list));
+			return;
+		}
+		instance_counter++;
 
 		// Get a hold on JADE runtime
 		jade.core.Runtime rt = jade.core.Runtime.instance();
 
 		// Exit the JVM when there are no more containers around
-		rt.setCloseVM(true);
+		rt.setCloseVM(!(args.length > 0));
 		rt.invokeOnTermination(() -> {
 			System.out.println("End of Simulation!");
+			instance_counter--;
 		});
 		System.out.print("runtime created\n");
 
 		// Create a default profile
-		String ip = null;//"10.0.0.6";
-		int port = 1200;//1099;
+		String ip = null;// "10.0.0.6";
+		int port = 1200;// 1099;
 		Profile profile = new ProfileImpl(ip, port, null);
 		System.out.print("profile created\n");
 
@@ -93,7 +119,7 @@ public class Start {
 //		for (BakeryObject bObj : bakeries) {
 //			port++;
 //			// create a container for each bakery
-			jade.wrapper.AgentContainer sideContainer = rt.createAgentContainer(new ProfileImpl(null, port, null));
+		jade.wrapper.AgentContainer sideContainer = rt.createAgentContainer(new ProfileImpl(null, port, null));
 //
 //			List<AID> ovenGuids = new ArrayList<>();
 //			List<AID> prepTableGuids = new ArrayList<>();
@@ -137,10 +163,12 @@ public class Start {
 //			sideContainer.createNewAgent(truckGUID + "-" + port, TruckAgent.class.getName(), new Object[] {}).start();
 //
 //			// start processing agents of bakery
-			AgentController controller = sideContainer.createNewAgent(/*bObj.getGuid()*/"bpagent",
-					BakeryProcessingAgent.class.getName(), /*new Object[] { bObj.getName(), bObj.getProducts(), ovenGuids,
-							prepTableGuids, packagingGUID + "-" + port*/new Object[0] );
-			controller.start();
+		AgentController controller = sideContainer.createNewAgent(/* bObj.getGuid() */"bpagent",
+				BakeryProcessingAgent.class.getName(), /*
+														 * new Object[] { bObj.getName(), bObj.getProducts(), ovenGuids,
+														 * prepTableGuids, packagingGUID + "-" + port
+														 */new Object[0]);
+		controller.start();
 //		}
 //
 //		// start clients
@@ -151,6 +179,7 @@ public class Start {
 					BakeryCustomerAgent.class.getName(), new Object[] { cObj.getName(), cObj.getOrders() });
 			controller2.start();
 		}
+
 	}
 
 	private static <T> T loadConfigData(String fileName, Class<T> dataClass) throws IOException, URISyntaxException {

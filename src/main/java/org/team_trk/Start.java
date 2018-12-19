@@ -15,11 +15,13 @@ import java.util.List;
 
 import org.team_trk.agents.BakeryCustomerAgent;
 import org.team_trk.agents.BakeryProcessingAgent;
+import org.team_trk.agents.OrderProcessing;
 import org.team_trk.domain.BreadOrder;
 import org.team_trk.domain.Product;
 
 import com.google.gson.Gson;
 
+import jade.content.frame.OrderedFrame;
 import jade.core.Profile;
 import jade.core.ProfileImpl;
 import jade.wrapper.AgentController;
@@ -41,25 +43,25 @@ public class Start {
 //				}
 //			};
 //			System.setOut(new PrintStream(voidStream));
-			String[] list = new File("project/src/main/resources/config/").list();
+//			String[] list = new File("project/src/main/resources/config/").list();
 //			try {
-				for (String s : list) {
-					System.err.println("------------------------------------------ running " + s
-							+ " ------------------------------------------");
-					main(new String[] { "project/src/main/resources/config/" + s });
-					while (instance_counter > 0) {
-						System.out.println(instance_counter);
-					}
-					System.err.println("------------------------------------------ finished " + s
-							+ " ------------------------------------------");
-					System.err.println();
-				}
-
+//				for (String s : list) {
+//					System.err.println("------------------------------------------ running " + s
+//							+ " ------------------------------------------");
+//					main(new String[] { "project/src/main/resources/config/" + s });
+//					while (instance_counter > 0) {
+//						System.out.println(instance_counter);
+//					}
+//					System.err.println("------------------------------------------ finished " + s
+//							+ " ------------------------------------------");
+//					System.err.println();
+//				}
+			scenarioPath = "src/main/resources/config/small";
 //			} finally {
 //				System.setOut(out);
 //			}
-			System.err.println("finished all scenarios of: "+Arrays.toString(list));
-			return;
+//			System.err.println("finished all scenarios of: " + Arrays.toString(list));
+//			return;
 		}
 		instance_counter++;
 
@@ -169,9 +171,17 @@ public class Start {
 														 * prepTableGuids, packagingGUID + "-" + port
 														 */new Object[0]);
 		controller.start();
+
+//		AgentController scheduler = sideContainer.createNewAgent("schedagent",
+//				BakeryProcessingAgent.class.getName(), new Object[0]);
+//		scheduler.start();
+//		
+//		AgentController orderProcessing = sideContainer.createNewAgent("opagent",
+//				OrderProcessing.class.getName(), new Object[0]);
+//		orderProcessing.start();
 //		}
-//
-//		// start clients
+
+		// start clients
 		List<ClientObject> clientObjects = loadConfigData(scenarioPath + "/clients.json", Clients.class);
 
 		for (ClientObject cObj : clientObjects) {

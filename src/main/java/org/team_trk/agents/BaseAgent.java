@@ -99,7 +99,7 @@ public abstract class BaseAgent extends Agent {
 	 * visualisation methods Use `baseAgent.sendMessage(message)` instead of
 	 * `myAgent.send(message)` in every behaviour.
 	 */
-	protected void sendMessage(ACLMessage msg) {
+	public void sendMessage(ACLMessage msg) {
 		this.send(msg);
 		this.visualiseHistoricalView(msg);
 		this.visualiseIndividualOrderStatus(msg);

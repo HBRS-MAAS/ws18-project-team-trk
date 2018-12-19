@@ -14,6 +14,7 @@ import jade.lang.acl.MessageTemplate;
 
 @SuppressWarnings("serial")
 public abstract class BaseAgent extends Agent {
+
 	private int currentDay;
 	private int currentHour;
 	private boolean allowAction = false;
@@ -27,6 +28,13 @@ public abstract class BaseAgent extends Agent {
 	 */
 	protected void setup() {
 		this.addBehaviour(new PermitAction());
+	}
+
+	/**
+	 * Template method - override this for the task in each time step. Don't forget
+	 * to call {@link BaseAgent#finished()} at the end.
+	 */
+	protected void stepAction() {
 	}
 
 	/*
@@ -45,6 +53,7 @@ public abstract class BaseAgent extends Agent {
 		} catch (FIPAException fe) {
 			fe.printStackTrace();
 		}
+		System.out.println("\nWARNING: getCurrentDay and getCurrentHour will be deprecated in future.\n");
 	}
 
 	/*
@@ -57,6 +66,7 @@ public abstract class BaseAgent extends Agent {
 		} catch (FIPAException fe) {
 			fe.printStackTrace();
 		}
+		System.out.println("\nWARNING: getCurrentDay and getCurrentHour will be deprecated in future.\n");
 	}
 
 	/*
@@ -84,12 +94,12 @@ public abstract class BaseAgent extends Agent {
 		return currentHour;
 	}
 
-	/**
+	/*
 	 * This function is used as a middle man which uses the message for different
 	 * visualisation methods Use `baseAgent.sendMessage(message)` instead of
 	 * `myAgent.send(message)` in every behaviour.
 	 */
-	public void sendMessage(ACLMessage msg) {
+	protected void sendMessage(ACLMessage msg) {
 		this.send(msg);
 		this.visualiseHistoricalView(msg);
 		this.visualiseIndividualOrderStatus(msg);
@@ -144,10 +154,9 @@ public abstract class BaseAgent extends Agent {
 	 */
 	private class PermitAction extends CyclicBehaviour {
 		private MessageTemplate mt;
-		private BaseAgent ba;
 
 		public void action() {
-			this.mt = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.INFORM),
+			this.mt = MessageTemplate.and(MessageTemplate.MatchPerformative(55),
 					MessageTemplate.MatchSender(baseAgent.clockAgent));
 			ACLMessage msg = myAgent.receive(this.mt);
 			if (msg != null) {
@@ -158,6 +167,8 @@ public abstract class BaseAgent extends Agent {
 				currentDay = day;
 				currentHour = hour;
 				allowAction = true;
+
+				stepAction();
 			} else {
 				block();
 			}

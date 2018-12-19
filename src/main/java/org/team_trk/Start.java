@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.lang.reflect.Array;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
@@ -13,9 +14,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.json.JSONObject;
 import org.team_trk.agents.BakeryCustomerAgent;
 import org.team_trk.agents.BakeryProcessingAgent;
+import org.team_trk.agents.CustomerAgent;
 import org.team_trk.agents.OrderProcessing;
+import org.team_trk.agents.SchedulerAgent;
 import org.team_trk.domain.BreadOrder;
 import org.team_trk.domain.Product;
 
@@ -64,6 +68,7 @@ public class Start {
 //			return;
 		}
 		instance_counter++;
+		System.out.println(String.format("Scenario is: %s", scenarioPath));
 
 		// Get a hold on JADE runtime
 		jade.core.Runtime rt = jade.core.Runtime.instance();
@@ -165,29 +170,61 @@ public class Start {
 //			sideContainer.createNewAgent(truckGUID + "-" + port, TruckAgent.class.getName(), new Object[] {}).start();
 //
 //			// start processing agents of bakery
-		AgentController controller = sideContainer.createNewAgent(/* bObj.getGuid() */"bpagent",
-				BakeryProcessingAgent.class.getName(), /*
-														 * new Object[] { bObj.getName(), bObj.getProducts(), ovenGuids,
-														 * prepTableGuids, packagingGUID + "-" + port
-														 */new Object[0]);
-		controller.start();
+//		AgentController controller = sideContainer.createNewAgent(/* bObj.getGuid() */"bpagent",
+//				BakeryProcessingAgent.class.getName(), /*
+//														 * new Object[] { bObj.getName(), bObj.getProducts(), ovenGuids,
+//														 * prepTableGuids, packagingGUID + "-" + port
+//														 */new Object[0]);
+//		controller.start();
 
-//		AgentController scheduler = sideContainer.createNewAgent("schedagent",
-//				BakeryProcessingAgent.class.getName(), new Object[0]);
-//		scheduler.start();
-//		
-//		AgentController orderProcessing = sideContainer.createNewAgent("opagent",
-//				OrderProcessing.class.getName(), new Object[0]);
-//		orderProcessing.start();
+		List<BakeryObject> bakeryObjects = loadConfigData(scenarioPath + "/bakeries.json", BakeryObjectList.class);
+
+		for (BakeryObject o : bakeryObjects) {
+			
+			String bakeryObjectAsJsonString = new Gson().toJson(o);
+
+			AgentController scheduler = sideContainer.createNewAgent("scheduler-" + o.getGuid().split("-")[1],
+					SchedulerAgent.class.getName(), new Object[] { bakeryObjectAsJsonString, "{durationInDays:300}" });
+			scheduler.start();
+
+
+//			Object orderProcessingObject = new Object() {
+//				String guid;
+//				Product[] products = o.getProducts().toArray(new Product[o.getProducts().size()]);
+//
+//				public String getGuid() {
+//					return guid;
+//				}
+//
+//				public void setGuid(String guid) {
+//					this.guid = guid;
+//				}
+//
+//				public Product[] getProducts() {
+//					return products;
+//				}
+//
+//				public void setProducts(Product[] products) {
+//					this.products = products;
+//				}
+//
+//			};
+
+			AgentController orderProcessing = sideContainer.createNewAgent(
+					"OrderProcessing-" + o.getGuid().split("-")[1], OrderProcessing.class.getName(),
+					new Object[] { bakeryObjectAsJsonString, "{durationInDays:300}" });
+			orderProcessing.start();
+		}
+
 //		}
 
 		// start clients
 		List<ClientObject> clientObjects = loadConfigData(scenarioPath + "/clients.json", Clients.class);
 
 		for (ClientObject cObj : clientObjects) {
-			AgentController controller2 = mainContainer.createNewAgent(cObj.getGuid(),
-					BakeryCustomerAgent.class.getName(), new Object[] { cObj.getName(), cObj.getOrders() });
-			controller2.start();
+//			AgentController customer = sideContainer.createNewAgent(cObj.getGuid(), CustomerAgent.class.getName(),
+//					new Object[0]);
+//			customer.start();
 		}
 
 	}

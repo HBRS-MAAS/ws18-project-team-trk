@@ -16,8 +16,10 @@ import java.util.List;
 
 import org.json.JSONObject;
 import org.team_trk.agents.BakeryCustomerAgent;
+import org.team_trk.agents.BakeryPackagingAgent;
 import org.team_trk.agents.BakeryProcessingAgent;
 import org.team_trk.agents.CustomerAgent;
+import org.team_trk.agents.LoadingBayAgent;
 import org.team_trk.agents.OrderProcessing;
 import org.team_trk.agents.SchedulerAgent;
 import org.team_trk.domain.BreadOrder;
@@ -214,6 +216,16 @@ public class Start {
 					"OrderProcessing-" + o.getGuid().split("-")[1], OrderProcessing.class.getName(),
 					new Object[] { bakeryObjectAsJsonString, "{durationInDays:300}" });
 			orderProcessing.start();
+			
+			AgentController packaging = sideContainer.createNewAgent(
+					"Packaging-" + o.getGuid().split("-")[1], BakeryPackagingAgent.class.getName(),
+					new Object[0] );
+			packaging.start();
+			
+			AgentController loadingBay = sideContainer.createNewAgent(
+					"LoadingBay-" + o.getGuid().split("-")[1], LoadingBayAgent.class.getName(),
+					new Object[0] );
+			loadingBay.start();
 		}
 
 //		}
@@ -222,9 +234,9 @@ public class Start {
 		List<ClientObject> clientObjects = loadConfigData(scenarioPath + "/clients.json", Clients.class);
 
 		for (ClientObject cObj : clientObjects) {
-//			AgentController customer = sideContainer.createNewAgent(cObj.getGuid(), CustomerAgent.class.getName(),
-//					new Object[0]);
-//			customer.start();
+			AgentController customer = sideContainer.createNewAgent(cObj.getName(), CustomerAgent.class.getName(),
+					new Object[0]);
+			customer.start();
 		}
 
 	}

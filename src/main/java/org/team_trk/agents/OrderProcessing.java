@@ -38,11 +38,6 @@ public class OrderProcessing extends BaseAgent {
 		}
 		this.register("OrderProcessing", this.sBakeryId);
 		findScheduler();
-		try {
-			Thread.sleep(30000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
 		addBehaviour(new OfferRequestServer());
 		System.out.println("OrderProcessing " + getName() + " ready");
 	}

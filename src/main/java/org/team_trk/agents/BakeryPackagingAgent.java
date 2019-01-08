@@ -15,6 +15,7 @@ import jade.domain.FIPAException;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
+import jade.lang.acl.MessageTemplate;
 
 public class BakeryPackagingAgent extends BaseAgent {
 	private static final long serialVersionUID = -5310054528477305012L;
@@ -59,7 +60,7 @@ public class BakeryPackagingAgent extends BaseAgent {
 
 		DFAgentDescription template = new DFAgentDescription();
 		ServiceDescription sd2 = new ServiceDescription();
-		sd2.setType("order-aggregator");
+		sd2.setType("loading-bay");
 		template.addServices(sd2);
 		AID aid = null;
 		try {
@@ -79,9 +80,9 @@ public class BakeryPackagingAgent extends BaseAgent {
 			@Override
 			public void action() {
 				switch (step_counter) {
-				case 0: // received ACLMessage: HashT(ID, value) -> ProductMessage -> via JsonConverter
-						// to String -> via setContent into message content
-					ACLMessage msg = receive();
+				case 0: 
+					MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.INFORM);
+					ACLMessage msg = baseAgent.receiveMessage(mt);
 					if (msg != null) {
 						String content = msg.getContent(); // String created out of the ProductMessage-Object with right
 															// brothers individual class JsonConverter
@@ -133,7 +134,8 @@ public class BakeryPackagingAgent extends BaseAgent {
 						String jsonFromPojo = gsonBuilder.toJson(item);
 						cfp.setContent(jsonFromPojo);
 						cfp.setConversationId("packaged-orders");
-						myAgent.send(cfp);
+						sendMessage(cfp);
+						System.out.println(cfp);
 						out.remove(0);
 					} else {
 						step_counter++;
@@ -145,6 +147,23 @@ public class BakeryPackagingAgent extends BaseAgent {
 					block();
 				}
 
+			}
+		});
+
+		// receive incoming orders
+		addBehaviour(new CyclicBehaviour() {
+
+			private static final long serialVersionUID = -1612002656692984627L;
+
+			@Override
+			public void action() {
+				MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.PROPAGATE);
+				ACLMessage msg = baseAgent.receiveMessage(mt);
+				if (msg != null) {
+					System.out.println(msg.getContent());
+				} else {
+					block();
+				}
 			}
 		});
 	}

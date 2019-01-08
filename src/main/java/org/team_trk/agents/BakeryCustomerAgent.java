@@ -3,7 +3,6 @@ package org.team_trk.agents;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.json.JSONObject;
 import org.team_trk.behaviours.RequestPerformer;
 import org.team_trk.domain.BreadOrder;
 
@@ -11,8 +10,6 @@ import jade.content.lang.Codec;
 import jade.content.lang.sl.SLCodec;
 import jade.content.onto.basic.Action;
 import jade.core.AID;
-import jade.core.Agent;
-import jade.core.Location;
 import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.TickerBehaviour;
 import jade.domain.DFService;

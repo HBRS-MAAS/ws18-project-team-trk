@@ -32,17 +32,18 @@ public class BakeryPackagingAgent extends BaseAgent {
 	// Put agent initializations here
 	protected void setup() {
 		// Register service in the yellow pages
-		DFAgentDescription dfd = new DFAgentDescription();
-		dfd.setName(getAID());
-		ServiceDescription sd = new ServiceDescription();
-		sd.setType("bakery-packaging");
-		sd.setName("JADE-bakery-packaging");
-		dfd.addServices(sd);
-		try {
-			DFService.register(this, dfd);
-		} catch (FIPAException fe) {
-			fe.printStackTrace();
-		}
+//		DFAgentDescription dfd = new DFAgentDescription();
+//		dfd.setName(getAID());
+//		ServiceDescription sd = new ServiceDescription();
+//		sd.setType("bakery-packaging");
+//		sd.setName("JADE-bakery-packaging");
+//		dfd.addServices(sd);
+//		try {
+//			DFService.register(this, dfd);
+//		} catch (FIPAException fe) {
+//			fe.printStackTrace();
+//		}
+		register("bakery-packaging", getAID().getName());
 
 		availableProducts = new HashMap<>();
 		productsPerBox = new HashMap<>();
@@ -79,10 +80,13 @@ public class BakeryPackagingAgent extends BaseAgent {
 
 			@Override
 			public void action() {
+				if (!getAllowAction()) {
+					return;
+				}
 				switch (step_counter) {
-				case 0: 
+				case 0:
 					MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.INFORM);
-					ACLMessage msg = baseAgent.receiveMessage(mt);
+					ACLMessage msg = baseAgent.receive(mt);
 					if (msg != null) {
 						String content = msg.getContent(); // String created out of the ProductMessage-Object with right
 															// brothers individual class JsonConverter
@@ -146,6 +150,7 @@ public class BakeryPackagingAgent extends BaseAgent {
 					step_counter = 0;
 					block();
 				}
+				finished();
 
 			}
 		});
@@ -158,7 +163,7 @@ public class BakeryPackagingAgent extends BaseAgent {
 			@Override
 			public void action() {
 				MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.PROPAGATE);
-				ACLMessage msg = baseAgent.receiveMessage(mt);
+				ACLMessage msg = baseAgent.receive(mt);
 				if (msg != null) {
 					System.out.println(msg.getContent());
 				} else {

@@ -22,6 +22,7 @@ import org.team_trk.agents.CustomerAgent;
 import org.team_trk.agents.LoadingBayAgent;
 import org.team_trk.agents.OrderProcessing;
 import org.team_trk.agents.SchedulerAgent;
+import org.team_trk.agents.TimeKeeper;
 import org.team_trk.domain.BreadOrder;
 import org.team_trk.domain.Product;
 
@@ -182,13 +183,12 @@ public class Start {
 		List<BakeryObject> bakeryObjects = loadConfigData(scenarioPath + "/bakeries.json", BakeryObjectList.class);
 
 		for (BakeryObject o : bakeryObjects) {
-			
+
 			String bakeryObjectAsJsonString = new Gson().toJson(o);
 
 			AgentController scheduler = sideContainer.createNewAgent("scheduler-" + o.getGuid().split("-")[1],
 					SchedulerAgent.class.getName(), new Object[] { bakeryObjectAsJsonString, "{durationInDays:300}" });
 			scheduler.start();
-
 
 //			Object orderProcessingObject = new Object() {
 //				String guid;
@@ -214,17 +214,15 @@ public class Start {
 
 			AgentController orderProcessing = sideContainer.createNewAgent(
 					"OrderProcessing-" + o.getGuid().split("-")[1], OrderProcessing.class.getName(),
-					new Object[] { bakeryObjectAsJsonString, "{durationInDays:300}" });
+					new Object[] { bakeryObjectAsJsonString, "{durationInDays:50}" });
 			orderProcessing.start();
-			
-			AgentController packaging = sideContainer.createNewAgent(
-					"Packaging-" + o.getGuid().split("-")[1], BakeryPackagingAgent.class.getName(),
-					new Object[0] );
+
+			AgentController packaging = sideContainer.createNewAgent("Packaging-" + o.getGuid().split("-")[1],
+					BakeryPackagingAgent.class.getName(), new Object[0]);
 			packaging.start();
-			
-			AgentController loadingBay = sideContainer.createNewAgent(
-					"LoadingBay-" + o.getGuid().split("-")[1], LoadingBayAgent.class.getName(),
-					new Object[0] );
+
+			AgentController loadingBay = sideContainer.createNewAgent("LoadingBay-" + o.getGuid().split("-")[1],
+					LoadingBayAgent.class.getName(), new Object[0]);
 			loadingBay.start();
 		}
 
@@ -238,6 +236,12 @@ public class Start {
 					new Object[0]);
 			customer.start();
 		}
+
+		String[] pathSplit = scenarioPath.split("config/");
+		System.out.println("timekeeper path: "+pathSplit[pathSplit.length - 1]);
+		AgentController timekeeper = sideContainer.createNewAgent("Timekeeper", TimeKeeper.class.getName(),
+				new Object[] { pathSplit[pathSplit.length - 1], "000.03.00" });
+		timekeeper.start();
 
 	}
 

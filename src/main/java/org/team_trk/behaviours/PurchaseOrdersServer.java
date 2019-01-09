@@ -3,7 +3,7 @@ package org.team_trk.behaviours;
 import java.util.List;
 
 import org.json.JSONObject;
-import org.team_trk.agents.BaseAgent;
+import org.team_trk.agents.BaseAgentOld;
 
 import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
@@ -13,7 +13,7 @@ public class PurchaseOrdersServer extends CyclicBehaviour {
 
 	private static final long serialVersionUID = 7938556330444711767L;
 
-	private BaseAgent baseAgent;
+	private BaseAgentOld baseAgent;
 
 //	private Hashtable<String, Book> catalogue;
 
@@ -22,8 +22,8 @@ public class PurchaseOrdersServer extends CyclicBehaviour {
 
 	@Override
 	public void action() {
-		if(baseAgent==null) {
-			baseAgent = (BaseAgent) myAgent;
+		if (baseAgent == null) {
+			baseAgent = (BaseAgentOld) myAgent;
 		}
 		MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.ACCEPT_PROPOSAL);
 		ACLMessage msg = baseAgent.receiveMessage(mt);

@@ -3,7 +3,7 @@ package org.team_trk.behaviours;
 import java.util.List;
 
 import org.json.JSONObject;
-import org.team_trk.agents.BaseAgent;
+import org.team_trk.agents.BaseAgentOld;
 
 import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
@@ -11,15 +11,15 @@ import jade.lang.acl.MessageTemplate;
 
 public class OfferRequestsServer extends CyclicBehaviour {
 	private static final long serialVersionUID = -3863996398471466048L;
-	
-	private BaseAgent baseAgent;
+
+	private BaseAgentOld baseAgent;
 
 	public OfferRequestsServer(List<Object> recipes) {
 	}
 
 	public void action() {
-		if(baseAgent==null) {
-			baseAgent = (BaseAgent) myAgent;
+		if (baseAgent == null) {
+			baseAgent = (BaseAgentOld) myAgent;
 		}
 		MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.CFP);
 		ACLMessage msg = baseAgent.receiveMessage(mt);

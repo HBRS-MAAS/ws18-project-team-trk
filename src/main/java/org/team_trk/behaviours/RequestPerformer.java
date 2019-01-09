@@ -1,7 +1,7 @@
 package org.team_trk.behaviours;
 
 import org.json.JSONObject;
-import org.team_trk.agents.BaseAgent;
+import org.team_trk.agents.BaseAgentOld;
 import org.team_trk.domain.BreadOrder;
 
 import jade.core.AID;
@@ -13,7 +13,7 @@ public class RequestPerformer extends Behaviour {
 
 	private static final long serialVersionUID = -147484173252708723L;
 
-	private BaseAgent baseAgent;
+	private BaseAgentOld baseAgent;
 
 	private AID bestSeller; // The agent who provides the best offer
 	private int bestPrice; // The best offered price
@@ -30,8 +30,8 @@ public class RequestPerformer extends Behaviour {
 	}
 
 	public void action() {
-		if(baseAgent==null) {
-			baseAgent = (BaseAgent) myAgent;
+		if (baseAgent == null) {
+			baseAgent = (BaseAgentOld) myAgent;
 		}
 		switch (step) {
 		case 0:

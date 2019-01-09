@@ -234,7 +234,7 @@ public class Start {
 		List<ClientObject> clientObjects = loadConfigData(scenarioPath + "/clients.json", Clients.class);
 
 		for (ClientObject cObj : clientObjects) {
-			AgentController customer = sideContainer.createNewAgent(cObj.getName(), CustomerAgent.class.getName(),
+			AgentController customer = sideContainer.createNewAgent(cObj.getGuid(), CustomerAgent.class.getName(),
 					new Object[0]);
 			customer.start();
 		}

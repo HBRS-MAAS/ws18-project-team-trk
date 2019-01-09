@@ -393,7 +393,7 @@ public class CustomerAgent extends BaseAgent {
   		//Take Orders from Customer (based on the name)
   		try {
   			for (int i = 0; i < dataArray.length(); i++) {
-  				customerID = dataArray.getJSONObject(i).getString("name");
+  				customerID = dataArray.getJSONObject(i).getString("guid");
   				
   				if (customerID.equals(id)) {
   					orders = dataArray.getJSONObject(i).getJSONArray("orders");

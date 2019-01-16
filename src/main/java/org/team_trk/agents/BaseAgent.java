@@ -1,19 +1,21 @@
 package org.team_trk.agents;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.team_trk.utils.Time;
 
-import jade.core.Agent;
 import jade.core.AID;
-import jade.core.behaviours.*;
-import jade.domain.FIPAAgentManagement.*;
-import jade.domain.FIPAException;
-import jade.domain.DFService;
-import jade.lang.acl.ACLMessage;
-import jade.lang.acl.MessageTemplate;
+import jade.core.Agent;
+import jade.core.behaviours.CyclicBehaviour;
 import jade.domain.DFService;
 import jade.domain.FIPAException;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
+import jade.lang.acl.ACLMessage;
+import jade.lang.acl.MessageTemplate;
 
 @SuppressWarnings("serial")
 public abstract class BaseAgent extends Agent {
@@ -21,7 +23,7 @@ public abstract class BaseAgent extends Agent {
     private Time currentTime;
     private boolean allowAction = false;
     protected AID clockAgent = new AID("TimeKeeper", AID.ISLOCALNAME);
-    //protected AID visualisationAgent = new AID("visualisation", AID.ISLOCALNAME);
+    protected AID visualisationAgent = new AID("visualisation", AID.ISLOCALNAME);
     protected BaseAgent baseAgent = this;
 	
     /* 
@@ -124,11 +126,35 @@ public abstract class BaseAgent extends Agent {
     protected void visualiseMessageQueuesByAgent(ACLMessage msg) {
     }
     protected void visualiseOrderBoard(ACLMessage msg) {
-       /*
-       msg.clearAllReceiver();
-       msg.addReceiver(visualisationAgent);
-       this.send(msg);
-       */
+    	List<String> visualizedMessages = Arrays
+    			.asList("^baking-request$", "^[\\w\\-]+\\-cooled\\-product\\-\\d+$", "^packaged-orders$");
+    	
+    	if(msg != null && msg.getConversationId() != null) {
+    		String conversationId = msg.getConversationId().toLowerCase();
+    		
+    		for(String pattern : visualizedMessages) {
+    			if(conversationId.matches(pattern)) {
+	    	    	msg.clearAllReceiver();
+	    	    	msg.addReceiver(visualisationAgent);
+	    	    	
+	    	    	// Add bakery id with conversation for baking request and packaged orders
+	    	    	if(!pattern.equals(visualizedMessages.get(1))) {
+	    	    		Matcher bakeryMatcher = Pattern.compile("^(\\w+)\\-(\\d+)\\-")
+	    	    				.matcher(msg.getSender().getLocalName());
+	    	    		
+	    	    		if(bakeryMatcher.lookingAt()) {
+	    	        		msg.setConversationId(
+	    	        				bakeryMatcher.group(1)+ "-" + bakeryMatcher.group(2) + "-" + msg.getConversationId()
+    	        				);
+	    	    		}
+	    	    	}
+	    	    	
+	    	    	this.send(msg);
+	    	    	
+	    	    	break;
+    			}
+    		}
+    	}
     }
     protected void visualiseStreetNetwork(ACLMessage msg) {
     }

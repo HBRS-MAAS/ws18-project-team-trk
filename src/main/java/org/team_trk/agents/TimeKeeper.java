@@ -1,35 +1,36 @@
 package org.team_trk.agents;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Vector;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.File;
 import java.util.Scanner;
-import com.fasterxml.jackson.core.type.TypeReference;
+import java.util.Vector;
 
-import jade.core.Agent;
-import jade.core.AID;
-import jade.core.behaviours.*;
-import jade.domain.DFService;
-import jade.domain.FIPAException;
-import jade.domain.FIPAAgentManagement.DFAgentDescription;
-import jade.domain.FIPAAgentManagement.ServiceDescription;
-import jade.lang.acl.ACLMessage;
-import jade.lang.acl.MessageTemplate;
+import org.team_trk.objects.Meta;
+import org.team_trk.utils.JsonConverter;
+import org.team_trk.utils.Time;
+
+import com.fasterxml.jackson.core.type.TypeReference;
 
 // for shutdown behaviour
 import jade.content.lang.Codec;
 import jade.content.lang.sl.SLCodec;
 import jade.content.onto.basic.Action;
+import jade.core.AID;
+import jade.core.Agent;
+import jade.core.behaviours.CyclicBehaviour;
+import jade.core.behaviours.OneShotBehaviour;
+import jade.domain.DFService;
+import jade.domain.FIPAException;
+import jade.domain.FIPANames;
+import jade.domain.FIPAAgentManagement.DFAgentDescription;
+import jade.domain.FIPAAgentManagement.SearchConstraints;
+import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.domain.JADEAgentManagement.JADEManagementOntology;
 import jade.domain.JADEAgentManagement.ShutdownPlatform;
-import jade.domain.FIPANames;
-
-import org.team_trk.objects.Meta;
-import org.team_trk.utils.Time;
-import org.team_trk.utils.JsonConverter;
+import jade.lang.acl.ACLMessage;
+import jade.lang.acl.MessageTemplate;
 
 @SuppressWarnings("serial")
 public class TimeKeeper extends Agent{
@@ -105,9 +106,12 @@ public class TimeKeeper extends Agent{
 	private List<DFAgentDescription> getAllAgents(){
 		DFAgentDescription template = new DFAgentDescription();
 		ServiceDescription sd = new ServiceDescription();
+		SearchConstraints getAll = new SearchConstraints();
+		getAll.setMaxResults(new Long(-1));
+//         sd.setName("JADE-bakery");
 		template.addServices(sd);
 		try {
-			DFAgentDescription[] result = DFService.search(this, template);
+			DFAgentDescription[] result = DFService.search(this, template, getAll);
 			return Arrays.asList(result);
 		}
 		catch (FIPAException fe) {
@@ -150,7 +154,7 @@ public class TimeKeeper extends Agent{
                 if (!finishedAgents.contains(agent)){
                     finishedAgents.add(agent);
                     countAgentsReplied--;
-                    if (countAgentsReplied == 5){
+                    if (countAgentsReplied == 0){
                         myAgent.addBehaviour(new SendTimeStep());
                         block();
                     }

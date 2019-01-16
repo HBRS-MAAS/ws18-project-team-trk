@@ -17,11 +17,11 @@ public class Order {
 	public Order(String json_order_string) {
 		products = new Hashtable<>();
 		JSONObject order = new JSONObject(json_order_string);
-		customer_agent_id = order.getString("customerId");
-		order_day = order.getJSONObject("orderDate").getInt("day");
-		order_hour = order.getJSONObject("orderDate").getInt("hour");
-		delivery_day = order.getJSONObject("deliveryDate").getInt("day");
-		delivery_hour = order.getJSONObject("deliveryDate").getInt("hour");
+		customer_agent_id = order.getString("customer_id");
+		order_day = order.getJSONObject("order_date").getInt("day");
+		order_hour = order.getJSONObject("order_date").getInt("hour");
+		delivery_day = order.getJSONObject("delivery_date").getInt("day");
+		delivery_hour = order.getJSONObject("delivery_date").getInt("hour");
 		guid = order.getString("guid");
 
 		Iterator<String> prouct_name_it = order.getJSONObject("products").keys();

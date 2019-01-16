@@ -3,22 +3,18 @@ package org.team_trk;
 import java.awt.geom.Point2D;
 import java.io.File;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintStream;
-import java.lang.reflect.Array;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import org.json.JSONObject;
-import org.team_trk.agents.BakeryCustomerAgent;
 import org.team_trk.agents.BakeryPackagingAgent;
-import org.team_trk.agents.BakeryProcessingAgent;
 import org.team_trk.agents.CustomerAgent;
+import org.team_trk.agents.DummyPrePackagingAgent;
 import org.team_trk.agents.LoadingBayAgent;
 import org.team_trk.agents.OrderProcessing;
 import org.team_trk.agents.SchedulerAgent;
@@ -28,7 +24,6 @@ import org.team_trk.domain.Product;
 
 import com.google.gson.Gson;
 
-import jade.content.frame.OrderedFrame;
 import jade.core.Profile;
 import jade.core.ProfileImpl;
 import jade.wrapper.AgentController;
@@ -217,12 +212,21 @@ public class Start {
 					new Object[] { bakeryObjectAsJsonString, "{durationInDays:50}" });
 			orderProcessing.start();
 
+			Map<String, Integer> productsPerBox = new HashMap<>();
+			for (Product p : o.getProducts()) {
+				productsPerBox.put(p.getGuid(), p.getPackaging().getBreadsPerBox());
+			}
+
 			AgentController packaging = sideContainer.createNewAgent("Packaging-" + o.getGuid().split("-")[1],
-					BakeryPackagingAgent.class.getName(), new Object[0]);
+					BakeryPackagingAgent.class.getName(), new Object[] { o.getGuid(), productsPerBox });
 			packaging.start();
 
+			AgentController prePackaging = sideContainer.createNewAgent("PrePackaging-" + o.getGuid().split("-")[1],
+					DummyPrePackagingAgent.class.getName(), new Object[0]);
+			prePackaging.start();
+
 			AgentController loadingBay = sideContainer.createNewAgent("LoadingBay-" + o.getGuid().split("-")[1],
-					LoadingBayAgent.class.getName(), new Object[0]);
+					LoadingBayAgent.class.getName(), new Object[] { o.getGuid() });
 			loadingBay.start();
 		}
 
@@ -238,9 +242,9 @@ public class Start {
 		}
 
 		String[] pathSplit = scenarioPath.split("config/");
-		System.out.println("timekeeper path: "+pathSplit[pathSplit.length - 1]);
+		System.out.println("timekeeper path: " + pathSplit[pathSplit.length - 1]);
 		AgentController timekeeper = sideContainer.createNewAgent("Timekeeper", TimeKeeper.class.getName(),
-				new Object[] { pathSplit[pathSplit.length - 1], "000.03.00" });
+				new Object[] { pathSplit[pathSplit.length - 1], "030.00.00" });
 		timekeeper.start();
 
 	}

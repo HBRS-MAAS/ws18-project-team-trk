@@ -5,15 +5,9 @@ Master [![Build Status](https://travis-ci.org/HBRS-MAAS/ws18-project-team-trk.sv
 
 Develop [![Build Status](https://travis-ci.org/HBRS-MAAS/ws18-project-team-trk.svg?branch=develop)](https://travis-ci.org/HBRS-MAAS/ws18-project-team-trk)
 
-The project contains a simple Jade client that tries to buy breads from a bakery. 
-The bakery responses to the request with a random price. 
-The buyer chooses the response with the lowest price and places the actual order.
-The bakery accepts the order and sends a response.
-The buyer gets the final response and closes.
+The project contains a customer that tries to buy different products from a bakery and the bakery that contains multiple agents that process the order and the products. Next to these agents there is a timekeeper that controls the flow of time for theother agents.
 
 ## Team Members
-* Robert Seboldt     - [@Umkipp](https://github.com/Umkipp)
-* Kirill Schreiner   - [@kschre](https://github.com/kschre)
 * Tim van der Meulen - [@tmeule2s](https://github.com/tmeule2s)
 
 ## Dependencies
@@ -29,6 +23,8 @@ It will automatically get the dependencies and start JADE with the configured ag
 In case you want to clean you workspace run
 
     gradle clean
+
+To change the scenario you can pass a parameter with the path to the scenraio folder.
 
 ## Eclipse
 To use this project with eclipse run

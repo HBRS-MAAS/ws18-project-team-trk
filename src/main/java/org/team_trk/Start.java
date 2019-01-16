@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.json.JSONObject;
 import org.team_trk.agents.BakeryPackagingAgent;
 import org.team_trk.agents.CustomerAgent;
 import org.team_trk.agents.DummyPrePackagingAgent;
@@ -175,6 +176,8 @@ public class Start {
 //														 */new Object[0]);
 //		controller.start();
 
+		String meta = new String(Files.readAllBytes(Paths.get(new File(scenarioPath + "/meta.json").toURI())));
+
 		List<BakeryObject> bakeryObjects = loadConfigData(scenarioPath + "/bakeries.json", BakeryObjectList.class);
 
 		for (BakeryObject o : bakeryObjects) {
@@ -182,7 +185,7 @@ public class Start {
 			String bakeryObjectAsJsonString = new Gson().toJson(o);
 
 			AgentController scheduler = sideContainer.createNewAgent("scheduler-" + o.getGuid().split("-")[1],
-					SchedulerAgent.class.getName(), new Object[] { bakeryObjectAsJsonString, "{durationInDays:300}" });
+					SchedulerAgent.class.getName(), new Object[] { bakeryObjectAsJsonString, meta });
 			scheduler.start();
 
 //			Object orderProcessingObject = new Object() {
@@ -209,7 +212,7 @@ public class Start {
 
 			AgentController orderProcessing = sideContainer.createNewAgent(
 					"OrderProcessing-" + o.getGuid().split("-")[1], OrderProcessing.class.getName(),
-					new Object[] { bakeryObjectAsJsonString, "{durationInDays:50}" });
+					new Object[] { bakeryObjectAsJsonString, meta });
 			orderProcessing.start();
 
 			Map<String, Integer> productsPerBox = new HashMap<>();

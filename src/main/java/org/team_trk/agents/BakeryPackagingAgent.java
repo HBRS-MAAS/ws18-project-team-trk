@@ -54,7 +54,7 @@ public class BakeryPackagingAgent extends BaseAgent {
 		register("bakery-packaging", getAID().getName());
 
 		availableProducts = new HashMap<>();
-		String bakeryGuid = (String) getArguments()[0];
+		final String bakeryGuid = (String) getArguments()[0];
 		productsPerBox = (Map<String, Integer>) getArguments()[1];
 		orders = new ArrayList<>();
 		out = new ArrayList<>();
@@ -120,10 +120,10 @@ public class BakeryPackagingAgent extends BaseAgent {
 							orders.add(o);
 						}
 					}
-					orders.sort((Order a, Order b) -> {
-						int diff = a.getDate().get("day") - b.getDate().get("day");
-						return ((diff != 0) ? diff : a.getDate().get("hour") - b.getDate().get("hour"));
-					});
+//					orders.sort((Order a, Order b) -> {
+//						int diff = a.getDate().get("day") - b.getDate().get("day");
+//						return ((diff != 0) ? diff : a.getDate().get("hour") - b.getDate().get("hour"));
+//					});
 				} else {
 					block();
 				}
@@ -158,7 +158,7 @@ public class BakeryPackagingAgent extends BaseAgent {
 						ACLMessage msg = baseAgent.receive(mt);
 						if (msg != null) {
 							String content = msg.getContent(); // String created out of the ProductMessage-Object with
-							System.out.println("received packaging content: " + content); // right
+							System.out.println(getAID().getName()+": received packaging content: " + content); // right
 							// brothers individual class JsonConverter
 							CooledProduct[] incoming = new Gson().fromJson(content, CooledProduct[].class);
 							for (CooledProduct c : incoming) {
@@ -180,7 +180,7 @@ public class BakeryPackagingAgent extends BaseAgent {
 									int needed = products.get(type);
 									if (needed <= available || available >= productsPerBox.get(type)) {
 										int maxPerBox = productsPerBox.get(type);
-										while (available >= needed) {
+										while (available >= needed && needed > 0) {
 											Box box = new Box(type, needed > maxPerBox ? maxPerBox : needed);
 											availableProducts.get(type).addQuantity(-1 * box.getQuantity());
 											products.put(type, products.get(type) - box.getQuantity());

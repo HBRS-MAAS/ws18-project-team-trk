@@ -111,7 +111,7 @@ public class DummyPrePackagingAgent extends BaseAgent {
 							Gson gsonBuilder = new GsonBuilder().create();
 							String jsonFromPojo = gsonBuilder.toJson(out);
 							cfp.setContent(String.format("[%s]", jsonFromPojo));
-							System.out.println(String.format("Sending content to packaging: %s", cfp.getContent()));
+							System.out.println(String.format(getAID().getName()+": Sending content to packaging: %s", cfp.getContent()));
 							cfp.setConversationId("packaged-orders");
 							sendMessage(cfp);
 						} else {

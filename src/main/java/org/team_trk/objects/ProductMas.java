@@ -1,75 +1,108 @@
 package org.team_trk.objects;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 public class ProductMas {
-    private String guid;
-    private Batch batch;
-    private Recipe recipe;
-    private Packaging packaging;
-    private Double salesPrice;
-    private Double productionCost;
 
-    public ProductMas(String guid, Batch batch, Recipe recipe, Packaging packaging, Double salesPrice,
-            Double productionCost) {
-        this.guid = guid;
-        this.batch = batch;
-        this.recipe = recipe;
-        this.packaging = packaging;
-        this.salesPrice = salesPrice;
-        this.productionCost = productionCost;
-    }
+	private String guid;
+	private int boxingTemp;
+	private Double salesPrice;
+	private int breadsPerOven;
+	private int breadsPerBox;
+	private int bakingTemp;
+	private JSONArray steps;
+	private Double productionCost;
 
-    public String getGuid() {
-        return guid;
-    }
+	public ProductMas(String guid, int boxingTemp, Double salesPrice, int breadsPerOven, int breadsPerBox,
+			int bakingTemp, JSONArray steps, Double productionCost) {
+		this.guid = guid;
+		this.boxingTemp = boxingTemp;
+		this.salesPrice = salesPrice;
+		this.breadsPerOven = breadsPerOven;
+		this.breadsPerBox = breadsPerBox;
+		this.steps = steps;
+		this.bakingTemp = bakingTemp;
+		this.productionCost = productionCost;
+	}
 
-    public void setGuid(String guid) {
-        this.guid = guid;
-    }
+	public ProductMas() {
+	}
 
-    public Batch getBatch() {
-        return batch;
-    }
+	public ProductMas(String json_product_string) {
+		JSONObject joProduct = new JSONObject(json_product_string);
+		this.guid = joProduct.getString("guid");
+		this.boxingTemp = joProduct.getJSONObject("packaging").getInt("boxingTemp");
+		this.breadsPerBox = joProduct.getJSONObject("packaging").getInt("breadsPerBox");
+		this.salesPrice = joProduct.getDouble("salesPrice");
+		this.productionCost = joProduct.getDouble("productionCost");
+		JSONObject recipe = joProduct.getJSONObject("recipe");
+		this.steps = recipe.getJSONArray("steps");
+		this.bakingTemp = recipe.getInt("bakingTemp");
+//        this.coolingRate = recipe.getInt("coolingRate");
+	}
 
-    public void setBatch(Batch batch) {
-        this.batch = batch;
-    }
+	public int getBakingTemp() {
+		return bakingTemp;
+	}
 
-    public Recipe getRecipe() {
-        return recipe;
-    }
+	public void setBakingTemp(int bakingTemp) {
+		this.bakingTemp = bakingTemp;
+	}
 
-    public void setRecipe(Recipe recipe) {
-        this.recipe = recipe;
-    }
+	public JSONArray getSteps() {
+		return steps;
+	}
 
-    public Packaging getPackaging() {
-        return packaging;
-    }
+	public void setSteps(JSONArray steps) {
+		this.steps = steps;
+	}
 
-    public void setPackaging(Packaging packaging) {
-        this.packaging = packaging;
-    }
+	public void setGuid(String guid) {
+		this.guid = guid;
+	}
 
-    public Double getSalesPrice() {
-        return salesPrice;
-    }
+	public void setBoxingTemp(int boxingTemp) {
+		this.boxingTemp = boxingTemp;
+	}
 
-    public void setSalesPrice(Double salesPrice) {
-        this.salesPrice = salesPrice;
-    }
+	public void setSalesPrice(Double salesPrice) {
+		this.salesPrice = salesPrice;
+	}
 
-    public Double getProductionCost() {
-        return productionCost;
-    }
+	public void setBreadsPerOven(int breadsPerOven) {
+		this.breadsPerOven = breadsPerOven;
+	}
 
-    public void setProductionCost(Double productionCost) {
-        this.productionCost = productionCost;
-    }
+	public void setBreadsPerBox(int breadsPerBox) {
+		this.breadsPerBox = breadsPerBox;
+	}
 
-    @Override
-    public String toString() {
-        return "ProductMas [guid=" + guid + ", batch=" + batch + ", recipe=" + recipe.toString()+ ", packaging=" + packaging
-                + ", salesPrice=" + salesPrice + ", productionCost=" + productionCost + "]";
-    }
+	public void setProductionCost(Double productionCost) {
+		this.productionCost = productionCost;
+	}
 
+	public String getGuid() {
+		return guid;
+	}
+
+	public int getBoxingTemp() {
+		return boxingTemp;
+	}
+
+	public Double getSalesPrice() {
+		return salesPrice;
+	}
+
+	public int getBreadsPerOven() {
+		return breadsPerOven;
+	}
+
+	public int getBreadsPerBox() {
+		return breadsPerBox;
+	}
+
+	public Double getProductionCost() {
+		return productionCost;
+	}
 }

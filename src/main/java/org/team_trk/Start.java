@@ -35,10 +35,38 @@ public class Start {
 	private static int instance_counter = 0;
 
 	public static void main(String[] args) throws StaleProxyException, IOException, URISyntaxException {
-		String scenarioPath = "";
+		// default parameter
+		String scenarioPath = "src/main/resources/config/small";
+		String ip = null;// "10.0.0.6";
+		int port = 1200;// 1099;
+
 		if (args != null && args.length > 0) {
-			scenarioPath = args[0];
-		} else {
+			for (int i = 0; i < args.length; i++) {
+				switch (args[i]) {
+				case "-host":
+					i++;
+					if (i < args.length) {
+						ip = args[i];
+					} else {
+						System.err.println("host ip definition after -host expected!");
+					}
+					break;
+				case "-port":
+					i++;
+					if (i < args.length) {
+						port = Integer.parseInt(args[i]);
+					} else {
+						System.err.println("port definition after -host expected!");
+					}
+					break;
+				default:
+					scenarioPath = args[i];
+					break;
+				}
+			}
+		}
+		System.out.println("Host was set to " + (ip != null ? ip : "localhost") + ":" + port);
+		System.out.println("Scenario path was set to " + scenarioPath);
 //			PrintStream out = System.out;
 //			OutputStream voidStream = new OutputStream() {
 //				@Override
@@ -59,15 +87,12 @@ public class Start {
 //							+ " ------------------------------------------");
 //					System.err.println();
 //				}
-			scenarioPath = "src/main/resources/config/small";
 //			} finally {
 //				System.setOut(out);
 //			}
 //			System.err.println("finished all scenarios of: " + Arrays.toString(list));
 //			return;
-		}
 		instance_counter++;
-		System.out.println(String.format("Scenario is: %s", scenarioPath));
 
 		// Get a hold on JADE runtime
 		jade.core.Runtime rt = jade.core.Runtime.instance();
@@ -81,8 +106,6 @@ public class Start {
 		System.out.print("runtime created\n");
 
 		// Create a default profile
-		String ip = null;// "10.0.0.6";
-		int port = 1200;// 1099;
 		Profile profile = new ProfileImpl(ip, port, null);
 		System.out.print("profile created\n");
 

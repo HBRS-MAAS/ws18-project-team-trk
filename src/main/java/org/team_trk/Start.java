@@ -8,131 +8,270 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import org.team_trk.BakeryObject.Equipment.DoughPrepTable;
-import org.team_trk.BakeryObject.Equipment.KneadingMachine;
-import org.team_trk.BakeryObject.Equipment.Oven;
-import org.team_trk.agents.BakeryCoolingRacksAgent;
-import org.team_trk.agents.BakeryCustomerAgent;
-import org.team_trk.agents.BakeryDoughPrepTableAgent;
-import org.team_trk.agents.BakeryKneadingAgent;
-import org.team_trk.agents.BakeryLoadingBayAgent;
-import org.team_trk.agents.BakeryOvenAgent;
+import org.json.JSONObject;
 import org.team_trk.agents.BakeryPackagingAgent;
-import org.team_trk.agents.BakeryProcessingAgent;
-import org.team_trk.agents.BakeryProoferAgent;
-import org.team_trk.agents.TruckAgent;
+import org.team_trk.agents.CustomerAgent;
+import org.team_trk.agents.DummyPrePackagingAgent;
+import org.team_trk.agents.LoadingBayAgent;
+import org.team_trk.agents.OrderProcessing;
+import org.team_trk.agents.SchedulerAgent;
+import org.team_trk.agents.TimeKeeper;
 import org.team_trk.domain.BreadOrder;
 import org.team_trk.domain.Product;
 
 import com.google.gson.Gson;
 
-import jade.core.AID;
 import jade.core.Profile;
 import jade.core.ProfileImpl;
 import jade.wrapper.AgentController;
 import jade.wrapper.StaleProxyException;
 
 public class Start {
+
+	private static int instance_counter = 0;
+
 	public static void main(String[] args) throws StaleProxyException, IOException, URISyntaxException {
-		String scenarioPath = (args != null && args.length > 0) ? args[0] : "src/main/resources/config/sample";
+		// default parameter
+		String scenarioPath = "src/main/resources/config/small";
+		String ip = null;// "10.0.0.6";
+		int port = 1200;// 1099;
+
+		if (args != null && args.length > 0) {
+			for (int i = 0; i < args.length; i++) {
+				switch (args[i]) {
+				case "-host":
+					i++;
+					if (i < args.length) {
+						ip = args[i];
+					} else {
+						System.err.println("host ip definition after -host expected!");
+					}
+					break;
+				case "-port":
+					i++;
+					if (i < args.length) {
+						port = Integer.parseInt(args[i]);
+					} else {
+						System.err.println("port definition after -host expected!");
+					}
+					break;
+				default:
+					scenarioPath = args[i];
+					break;
+				}
+			}
+		}
+		System.out.println("Host was set to " + (ip != null ? ip : "localhost") + ":" + port);
+		System.out.println("Scenario path was set to " + scenarioPath);
+//			PrintStream out = System.out;
+//			OutputStream voidStream = new OutputStream() {
+//				@Override
+//				public void write(int b) throws IOException {
+//				}
+//			};
+//			System.setOut(new PrintStream(voidStream));
+//			String[] list = new File("project/src/main/resources/config/").list();
+//			try {
+//				for (String s : list) {
+//					System.err.println("------------------------------------------ running " + s
+//							+ " ------------------------------------------");
+//					main(new String[] { "project/src/main/resources/config/" + s });
+//					while (instance_counter > 0) {
+//						System.out.println(instance_counter);
+//					}
+//					System.err.println("------------------------------------------ finished " + s
+//							+ " ------------------------------------------");
+//					System.err.println();
+//				}
+//			} finally {
+//				System.setOut(out);
+//			}
+//			System.err.println("finished all scenarios of: " + Arrays.toString(list));
+//			return;
+		instance_counter++;
 
 		// Get a hold on JADE runtime
 		jade.core.Runtime rt = jade.core.Runtime.instance();
 
 		// Exit the JVM when there are no more containers around
-		rt.setCloseVM(true);
+		rt.setCloseVM(!(args.length > 0));
 		rt.invokeOnTermination(() -> {
 			System.out.println("End of Simulation!");
+			instance_counter--;
 		});
 		System.out.print("runtime created\n");
 
 		// Create a default profile
-		Profile profile = new ProfileImpl(null, 1200, null);
+		Profile profile = new ProfileImpl(ip, port, null);
 		System.out.print("profile created\n");
 
 		// rt.startUp(profile);
 
 		System.out.println("Launching a whole in-process platform..." + profile);
-		jade.wrapper.AgentContainer mainContainer = rt.createMainContainer(profile);
+		jade.wrapper.AgentContainer mainContainer = null;
+		if (ip == null) {
+			mainContainer = rt.createMainContainer(profile);
+		} else {
+			mainContainer = rt.createAgentContainer(profile);
+		}
 		System.out.println("containers created");
 		System.out.println("Launching the rma agent on the main container ...");
 		AgentController rma = mainContainer.createNewAgent("rma", "jade.tools.rma.rma", new Object[0]);
 		rma.start();
 
-		String prooferGUID = "bakery-proofer";
-		String coolingRacksGUID = "bakery-cooling-racks";
+//		Thread t = new Thread() {
+//			@Override
+//			public void run() {
+//				MessageQueueGUI.open(new String[0]);
+//			}
+//		};
+//		t.start();
+
+//		AgentController messageQueue = mainContainer.createNewAgent("MessageQueue", MessageQueueAgent.class.getName(),
+//				new Object[0]);
+//		messageQueue.start();
+
+//		String prooferGUID = "bakery-proofer";
+//		String coolingRacksGUID = "bakery-cooling-racks";
 		String packagingGUID = "bakery-packaging";
-		String loadingBayGUID = "bakery-loading-bay";
-		String truckGUID = "truck";
-		String mailboxGUID = "customer-mailbox";
+//		String loadingBayGUID = "bakery-loading-bay";
+//		String truckGUID = "truck";
+//		String mailboxGUID = "customer-mailbox";
+//
+//		// start bakeries
+//		List<BakeryObject> bakeries = loadConfigData(scenarioPath + "/bakeries.json", BakeryObjectList.class);
+//		int port = 1200;
+//		for (BakeryObject bObj : bakeries) {
+//			port++;
+//			// create a container for each bakery
+		jade.wrapper.AgentContainer sideContainer = rt.createAgentContainer(new ProfileImpl(null, port, null));
+//
+//			List<AID> ovenGuids = new ArrayList<>();
+//			List<AID> prepTableGuids = new ArrayList<>();
+//			List<AID> kneadingMachineGuids = new ArrayList<>();
+//			if (bObj.getEquipment() != null) {
+//				// start equipment agents for the bakery
+//				org.team_trk.BakeryObject.Equipment e = bObj.getEquipment();
+//				for (Oven o : e.getOvens()) {
+//					AgentController oven = sideContainer.createNewAgent(o.getGuid(), BakeryOvenAgent.class.getName(),
+//							new Object[] { bObj.getGuid(), o.getCoolingRate(), o.getHeatingRate(),
+//									coolingRacksGUID + "-" + port });
+//					oven.start();
+//					ovenGuids.add(new AID(o.getGuid(), true));
+//				}
+//				for (KneadingMachine km : e.getKneadingMachines()) {
+//					AgentController oven = sideContainer.createNewAgent(km.getGuid(),
+//							BakeryKneadingAgent.class.getName(),
+//							new Object[] { bObj.getGuid(), prooferGUID + "-" + port });
+//					oven.start();
+//					kneadingMachineGuids.add(new AID(km.getGuid(), true));
+//				}
+//				for (DoughPrepTable dpt : e.getDoughPrepTables()) {
+//					AgentController oven = sideContainer.createNewAgent(dpt.getGuid(),
+//							BakeryDoughPrepTableAgent.class.getName(),
+//							new Object[] { bObj.getGuid(), kneadingMachineGuids });
+//					oven.start();
+//					prepTableGuids.add(new AID(dpt.getGuid(), true));
+//
+//				}
+//			}
+//
+//			// start rest of agents for the bakery
+//			sideContainer.createNewAgent(prooferGUID + "-" + port, BakeryProoferAgent.class.getName(),
+//					new Object[] { ovenGuids }).start();
+//			sideContainer.createNewAgent(coolingRacksGUID + "-" + port, BakeryCoolingRacksAgent.class.getName(),
+//					new Object[] { packagingGUID + "-" + port }).start();
+//			sideContainer.createNewAgent(packagingGUID + "-" + port, BakeryPackagingAgent.class.getName(),
+//					new Object[] { loadingBayGUID + "-" + port }).start();
+//			sideContainer.createNewAgent(loadingBayGUID + "-" + port, BakeryLoadingBayAgent.class.getName(),
+//					new Object[] { truckGUID + "-" + port }).start();
+//			sideContainer.createNewAgent(truckGUID + "-" + port, TruckAgent.class.getName(), new Object[] {}).start();
+//
+//			// start processing agents of bakery
+//		AgentController controller = sideContainer.createNewAgent(/* bObj.getGuid() */"bpagent",
+//				BakeryProcessingAgent.class.getName(), /*
+//														 * new Object[] { bObj.getName(), bObj.getProducts(), ovenGuids,
+//														 * prepTableGuids, packagingGUID + "-" + port
+//														 */new Object[0]);
+//		controller.start();
 
-		// start bakeries
-		List<BakeryObject> bakeries = loadConfigData(scenarioPath + "/bakeries.json", BakeryObjectList.class);
-		int port = 1200;
-		for (BakeryObject bObj : bakeries) {
-			port++;
-			// create a container for each bakery
-			jade.wrapper.AgentContainer sideContainer = rt.createAgentContainer(new ProfileImpl(null, port, null));
+		String meta = new String(Files.readAllBytes(Paths.get(new File(scenarioPath + "/meta.json").toURI())));
 
-			List<AID> ovenGuids = new ArrayList<>();
-			List<AID> prepTableGuids = new ArrayList<>();
-			List<AID> kneadingMachineGuids = new ArrayList<>();
-			if (bObj.getEquipment() != null) {
-				// start equipment agents for the bakery
-				org.team_trk.BakeryObject.Equipment e = bObj.getEquipment();
-				for (Oven o : e.getOvens()) {
-					AgentController oven = sideContainer.createNewAgent(o.getGuid(), BakeryOvenAgent.class.getName(),
-							new Object[] { bObj.getGuid(), o.getCoolingRate(), o.getHeatingRate(),
-									coolingRacksGUID + "-" + port });
-					oven.start();
-					ovenGuids.add(new AID(o.getGuid(), true));
-				}
-				for (KneadingMachine km : e.getKneadingMachines()) {
-					AgentController oven = sideContainer.createNewAgent(km.getGuid(),
-							BakeryKneadingAgent.class.getName(),
-							new Object[] { bObj.getGuid(), prooferGUID + "-" + port });
-					oven.start();
-					kneadingMachineGuids.add(new AID(km.getGuid(), true));
-				}
-				for (DoughPrepTable dpt : e.getDoughPrepTables()) {
-					AgentController oven = sideContainer.createNewAgent(dpt.getGuid(),
-							BakeryDoughPrepTableAgent.class.getName(),
-							new Object[] { bObj.getGuid(), kneadingMachineGuids });
-					oven.start();
-					prepTableGuids.add(new AID(dpt.getGuid(), true));
+		List<BakeryObject> bakeryObjects = loadConfigData(scenarioPath + "/bakeries.json", BakeryObjectList.class);
 
-				}
+		for (BakeryObject o : bakeryObjects) {
+
+			String bakeryObjectAsJsonString = new Gson().toJson(o);
+
+			AgentController scheduler = sideContainer.createNewAgent("scheduler-" + o.getGuid().split("-")[1],
+					SchedulerAgent.class.getName(), new Object[] { bakeryObjectAsJsonString, meta });
+			scheduler.start();
+
+//			Object orderProcessingObject = new Object() {
+//				String guid;
+//				Product[] products = o.getProducts().toArray(new Product[o.getProducts().size()]);
+//
+//				public String getGuid() {
+//					return guid;
+//				}
+//
+//				public void setGuid(String guid) {
+//					this.guid = guid;
+//				}
+//
+//				public Product[] getProducts() {
+//					return products;
+//				}
+//
+//				public void setProducts(Product[] products) {
+//					this.products = products;
+//				}
+//
+//			};
+
+			AgentController orderProcessing = sideContainer.createNewAgent(
+					"OrderProcessing-" + o.getGuid().split("-")[1], OrderProcessing.class.getName(),
+					new Object[] { bakeryObjectAsJsonString, meta });
+			orderProcessing.start();
+
+			Map<String, Integer> productsPerBox = new HashMap<>();
+			for (Product p : o.getProducts()) {
+				productsPerBox.put(p.getGuid(), p.getPackaging().getBreadsPerBox());
 			}
 
-			// start rest of agents for the bakery
-			sideContainer.createNewAgent(prooferGUID + "-" + port, BakeryProoferAgent.class.getName(),
-					new Object[] { ovenGuids }).start();
-			sideContainer.createNewAgent(coolingRacksGUID + "-" + port, BakeryCoolingRacksAgent.class.getName(),
-					new Object[] { packagingGUID + "-" + port }).start();
-			sideContainer.createNewAgent(packagingGUID + "-" + port, BakeryPackagingAgent.class.getName(),
-					new Object[] { loadingBayGUID + "-" + port }).start();
-			sideContainer.createNewAgent(loadingBayGUID + "-" + port, BakeryLoadingBayAgent.class.getName(),
-					new Object[] { truckGUID + "-" + port }).start();
-			sideContainer.createNewAgent(truckGUID + "-" + port, TruckAgent.class.getName(), new Object[] {}).start();
+			AgentController packaging = sideContainer.createNewAgent("Packaging-" + o.getGuid().split("-")[1],
+					BakeryPackagingAgent.class.getName(), new Object[] { o.getGuid(), productsPerBox });
+			packaging.start();
 
-			// start processing agents of bakery
-			AgentController controller = sideContainer.createNewAgent(bObj.getGuid(),
-					BakeryProcessingAgent.class.getName(), new Object[] { bObj.getName(), bObj.getProducts(), ovenGuids,
-							prepTableGuids, packagingGUID + "-" + port });
-			controller.start();
+			AgentController prePackaging = sideContainer.createNewAgent("PrePackaging-" + o.getGuid().split("-")[1],
+					DummyPrePackagingAgent.class.getName(), new Object[0]);
+			prePackaging.start();
+
+			AgentController loadingBay = sideContainer.createNewAgent("LoadingBay-" + o.getGuid().split("-")[1],
+					LoadingBayAgent.class.getName(), new Object[] { o.getGuid() });
+			loadingBay.start();
 		}
+
+//		}
 
 		// start clients
 		List<ClientObject> clientObjects = loadConfigData(scenarioPath + "/clients.json", Clients.class);
 
 		for (ClientObject cObj : clientObjects) {
-			AgentController controller = mainContainer.createNewAgent(cObj.getGuid(),
-					BakeryCustomerAgent.class.getName(), new Object[] { cObj.getName(), cObj.getOrders() });
-			controller.start();
-//			mainContainer.createNewAgent(mailboxGUID, MailboxAgent.class.getName(), new Object[] {}).start();;
+			AgentController customer = sideContainer.createNewAgent(cObj.getGuid(), CustomerAgent.class.getName(),
+					new Object[0]);
+			customer.start();
 		}
+
+		String[] pathSplit = scenarioPath.split("config/");
+		System.out.println("timekeeper path: " + pathSplit[pathSplit.length - 1]);
+		AgentController timekeeper = sideContainer.createNewAgent("Timekeeper", TimeKeeper.class.getName(),
+				new Object[] { pathSplit[pathSplit.length - 1], "030.00.00" });
+		timekeeper.start();
 
 	}
 

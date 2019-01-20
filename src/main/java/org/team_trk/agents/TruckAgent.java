@@ -10,7 +10,7 @@ import jade.domain.FIPAException;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 
-public class TruckAgent extends Agent {
+public class TruckAgent extends BaseAgent {
 	private static final long serialVersionUID = -5310054528477305012L;
 	// The catalogue of books for sale (maps the title of a book to its price)
 	private List<Object> content;

@@ -30,6 +30,10 @@ public class ProductSender extends CyclicBehaviour {
 			/*
 			 * for (int i = 0; i < to.size(); ++i) { cfp.addReceiver(to.get(i)); }
 			 */
+			if(to.isEmpty()) {
+				block();
+				break;
+			}
 			cfp.addReceiver(to.get(0));
 
 			cfp.setContent(products.toString());
